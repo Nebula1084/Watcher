@@ -1,31 +1,25 @@
 package em.watcher;
 
 import em.watcher.mouse.Mouse;
+import em.watcher.user.UserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import java.io.IOException;
 
 @SpringBootApplication
-@RestController
 public class App {
 
-    @RequestMapping("/")
-    public String home() {
-        return "Hello World";
-    }
-
-
     public static void main(String[] args) {
-        SpringApplication.run(App.class, args);
+        ConfigurableApplicationContext applicationContext = SpringApplication.run(App.class, args);
         try {
             Mouse.start();
-            System.out.println("started");
         } catch (IOException e) {
             e.printStackTrace();
         }
+        UserService userService = (UserService) WatcherContextUtil.getBean("userService");
+        userService.register("a2", "p1", "n1");
     }
 
 }

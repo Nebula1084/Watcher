@@ -1,9 +1,6 @@
 package em.watcher.mouse;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -29,6 +26,7 @@ public class Mouse {
 
     private Mouse() throws IOException {
         serverSocket = new ServerSocket(Mouse.PORT);
+        System.out.println("Mouse::Mouse()");
     }
 
     private void startSocket() {
@@ -51,4 +49,6 @@ public class Mouse {
             }
         }
     };
+
+
 }
