@@ -1,15 +1,116 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Getting Started: Handling Form Submission</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="keywords" content="Modern Responsive web template, Bootstrap Web Templates, Flat Web Templates, Andriod Compatible web template,
+Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyErricsson, Motorola web design"/>
+    <script type="application/x-javascript">
+        addEventListener("load", function () {
+            setTimeout(hideURLbar, 0);
+        }, false);
+        function hideURLbar() {
+            window.scrollTo(0, 1);
+        }
+    </script>
+    <link href="/css/bootstrap.min.css" rel='stylesheet' type='text/css'/>
+    <link href="/css/style.css" rel='stylesheet' type='text/css'/>
+    <link href="/css/lines.css" rel='stylesheet' type='text/css'/>
+    <link href="/css/font-awesome.css" rel="stylesheet"/>
+    <script src="/js/jquery.min.js"></script>
+    <link href='http://fonts.useso.com/css?family=Roboto:400,100,300,500,700,900' rel='stylesheet' type='text/css'/>
+    <link href="/css/custom.css" rel="stylesheet"/>
+    <script src="/js/metisMenu.min.js"></script>
+    <script src="/js/custom.js"></script>
+    <script src="/js/d3.v3.js"></script>
+    <script src="/js/rickshaw.js"></script>
 </head>
 <body>
-<h1>Form</h1>
-<form action="#" th:action="@{/login.do}" th:object="${user}" method="post">
-    <p>Account: <input type="text" th:field="*{account}"/></p>
-    <p>Password: <input type="text" th:field="*{password}"/></p>
-    <p><input type="submit" value="Submit"/> <input type="reset" value="Reset"/></p>
-</form>
+<div id="wrapper">
+
+    <nav th:fragment="navigator" class="top1 navbar navbar-default navbar-static-top" role="navigation"
+         style="margin-bottom: 0">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="index.html">Stock Management</a>
+        </div>
+
+        <ul class="nav navbar-nav navbar-right">
+
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle avatar" data-toggle="dropdown">
+                    <i class="fa fa-user"></i>
+                </a>
+                <ul class="dropdown-menu">
+                    <li class="m_2"><a href="/profile.html"><i class="fa fa-user"></i> Profile</a></li>
+                    <li class="m_2"><a href="/logout.do"><i class="fa fa-lock"></i> Logout</a></li>
+                </ul>
+            </li>
+        </ul>
+        <div class="navbar-default sidebar" role="navigation">
+            <div class="sidebar-nav navbar-collapse">
+                <ul class="nav" id="side-menu">
+                    <li>
+                        <a href="/index.html"><i class="fa fa-dashboard fa-fw nav_icon"></i>Home</a>
+                    </li>
+                    <li>
+                        <a href="/add_stock.html"><i class="fa fa-check-square-o nav_icon"></i>Add Stock</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="copyrights">Collect from <a href="http://www.cssmoban.com/">网页模板</a></div>
+    <div id="page-wrapper">
+        <div class="graphs">
+            <div class="xs content_bottom">
+                <h3>Home</h3>
+                <div class="bs-example4" data-example-id="contextual-table">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Stock code</th>
+                            <th>Stock name</th>
+                            <th>Stock price</th>
+                            <th>Surging limit(New)</th>
+                            <th>Decline limit(New)</th>
+                            <th>Least price</th>
+                            <th>Hight price</th>
+                            <th>State</th>
+                        </tr>
+                        </thead>
+                        <tr th:class="${rowStat.odd} ? 'active' : 'success'" th:each="stock,rowStat : ${stocks}">
+                            <th scope="row">
+                                <a th:inline="text" th:href="@{'/order/'+${stock.code}+'.html'}">
+                                    [[${stock.code}]]
+                                    <i class="fa fa-paperclip"></i>
+                                </a>
+                            </th>
+                            <td th:text="${stock.name}"></td>
+                            <td th:text="${stock.price}"></td>
+                            <td th:text="${stock.surging_range*100+'%('+stock.surging_range_set*100+'%)'}"></td>
+                            <td th:text="${stock.decline_range*100+'%('+stock.decline_range_set*100+'%)'}"></td>
+                            <td th:text="${stock.least_price}"></td>
+                            <td th:text="${stock.highest_price}"></td>
+                            <td th:text="${stock.state}"></td>
+                        </tr>
+                    </table>
+                </div>
+
+            </div>
+            <div th:fragment="footer" class="copy">
+                <p>Copyright &copy; 2016 ZJU. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/bootstrap.min.js"></script>
 </body>
 </html>

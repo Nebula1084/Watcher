@@ -1,0 +1,90 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Register</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="keywords" content="Modern Responsive web template, Bootstrap Web Templates, Flat Web Templates, Andriod Compatible web template,
+Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyErricsson, Motorola web design"/>
+    <link href="/css/bootstrap.min.css" rel='stylesheet' type='text/css'/>
+    <link href="/css/style.css" rel='stylesheet' type='text/css'/>
+    <link href="/css/font-awesome.css" rel="stylesheet"/>
+    <script src="/js/jquery.min.js"></script>
+    <link href='http://fonts.useso.com/css?family=Roboto:400,100,300,500,700,900' rel='stylesheet' type='text/css'/>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/myUtil.js"></script>
+
+    <script th:inline="javascript">
+        var account;
+        var full_name;
+        var ret_password;
+        var org_password;
+        window.onload = function () {
+            account = $('#account');
+            full_name = $('#full-name');
+            org_password = $('#org-password');
+            ret_password = $('#ret-password');
+            /*<![CDATA[*/
+
+            switch ([[${curStatus.status}]]) {
+                case 3:
+                    showBar(account, "Account already exist.");
+                    break;
+                case 2:
+                    showBar(account, "Character is not valid. Only a-z, A-Z and _");
+                    break;
+            }
+
+            /*]]>*/
+        };
+
+        addEventListener("load", function () {
+            setTimeout(hideURLbar, 0);
+        }, false);
+        function hideURLbar() {
+            window.scrollTo(0, 1);
+        }
+
+        function validate() {
+
+            var ret = checkEmpty([account, full_name, org_password, ret_password]);
+            if (!ret) return ret;
+            if (org_password.val() != ret_password.val()) {
+                ret = false;
+                showBar(ret_password, "Passwords don't match.");
+            }
+            return ret;
+        }
+    </script>
+</head>
+<body id="login">
+<div class="login-logo">
+    <a href="index.html"><img src="images/logo.png" alt=""/></a>
+</div>
+<h2 class="form-heading">Register</h2>
+<form th:action="@{/register.do}" th:object="${user}"
+      class="form-signin app-cam" onsubmit="return validate()" method="post">
+    <input id="account" th:field="*{account}" type="text" class="form-control1" placeholder="Account" autofocus=""
+           data-toggle="popover" data-placement="right"
+    />
+    <input id="full-name" th:field="*{fullName}" type="text" class="form-control1" placeholder="Full Name"
+           data-toggle="popover" data-placement="right"/>
+    <input id="org-password" th:field="*{password}" type="password" class="form-control1" placeholder="Password"
+           data-toggle="popover" data-placement="right"/>
+    <input id="ret-password" type="password" class="form-control1" placeholder="Re-type Password"
+           data-toggle="popover" data-placement="right"/>
+    <button class="btn btn-lg btn-success1 btn-block" type="submit">Submit</button>
+    <div class="registration">
+        Already Registered.
+        <a class="" href="login.html">
+            Login
+        </a>
+    </div>
+</form>
+<div th:replace="login.html :: footer">
+</div>
+<script>
+
+</script>
+</body>
+</html>

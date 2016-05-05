@@ -6,18 +6,18 @@ import javax.persistence.Id;
 @Entity
 public class User {
     @Id
-    private String account;
-    private String password;
-    private String nickName;
+    private String account="";
+    private String password="";
+    private String fullName="";
 
     public User() {
 
     }
 
-    public User(String account, String password, String nickName) {
+    public User(String account, String password, String fullName) {
         this.account = account;
         this.password = password;
-        this.nickName = nickName;
+        this.fullName = fullName;
     }
 
     public void setAccount(String account) {
@@ -28,8 +28,8 @@ public class User {
         this.password = password;
     }
 
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getAccount() {
@@ -40,8 +40,11 @@ public class User {
         return password;
     }
 
-    public String getNickName() {
-        return nickName;
+    public String getFullName() {
+        return fullName;
     }
 
+    public String toString() {
+        return String.format("{account:%s, password:%s, fullName:%s}", this.account, this.password, this.fullName);
+    }
 }
