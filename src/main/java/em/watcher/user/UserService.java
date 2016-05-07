@@ -1,5 +1,8 @@
 package em.watcher.user;
 
+import em.watcher.control.Control;
+import em.watcher.device.Device;
+import em.watcher.report.Report;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,5 +47,23 @@ public class UserService {
     @Transactional
     public void save(User user) {
         this.userRepository.save(user);
+    }
+
+    @Transactional
+    public void registerDevice(User user, Device device) {
+        user.addDevice(device);
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void registerControl(User user, Control control) {
+        user.addControl(control);
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void registerReport(User user, Report report) {
+        user.addReport(report);
+        userRepository.save(user);
     }
 }

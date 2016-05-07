@@ -1,4 +1,18 @@
 package em.watcher.control;
 
-public class Control {
+import em.watcher.WatcherPacket;
+
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "control")
+public class Control extends WatcherPacket{
+    public Control(){
+        super();
+    }
+
+    public Control(String name){
+        super(name);
+    }
 }

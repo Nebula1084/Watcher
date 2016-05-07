@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Title</title>
+</head>
+<body>
+<form method="post" role="form" class="form-horizontal"
+      th:fragment="fields_form (name, target)"
+      onsubmit="return validate()" th:action="${target}">
+
+    <div class="form-group">
+        <label class="col-md-2 control-label" th:inline="text">[[${name}]] name</label>
+        <div class="col-md-8">
+            <div class="input-group">
+									<span class="input-group-addon">
+										<i class="fa fa-key"></i>
+									</span>
+                <input type="text" class="form-control1" th:name="name_fields"
+                       placeholder="name" data-toggle="popover"
+                       data-placement="right"/>
+            </div>
+        </div>
+    </div>
+
+    <div id="fileds">
+        <div class="form-group">
+            <label class="col-md-2 control-label">Field</label>
+            <div class="col-md-3">
+                <div class="input-group">
+									<span class="input-group-addon">
+                                        Name
+									</span>
+                    <input type="text" class="form-control1"
+                           name="name1" placeholder="name" data-toggle="popover"
+                           data-placement="right"/>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="input-group">
+									<span class="input-group-addon">
+                                        Type
+									</span>
+                    <select class="form-control1" name="type1"
+                            onchange="opChange(this,
+                                                this.parentElement.parentElement.nextElementSibling.firstElementChild)">
+                        <option value="int" selected="selected">int</option>
+                        <option value="float">float</option>
+                        <option value="char">char</option>
+                        <option value="string"> string</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="input-group">
+									<span class="input-group-addon">
+                                        Length
+									</span>
+                    <input type="number" min="1" max="1000" class="form-control1"
+                           name="length1" placeholder="" readonly="" value="4"/>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-sm-7 col-sm-offset-2">
+                <input type="submit" class="btn-success btn" value="submit"/>
+            </div>
+            <div class="col-sm-offset-1">
+                <input type="button" class="btn-success btn" value="append"
+                       onclick="append('#fileds')"/>
+            </div>
+        </div>
+    </div>
+
+</form>
+</body>
+</html>

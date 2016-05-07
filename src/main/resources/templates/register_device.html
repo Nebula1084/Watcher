@@ -1,0 +1,111 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Device</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="keywords" content="Modern Responsive web template, Bootstrap Web Templates, Flat Web Templates, Andriod Compatible web template,
+Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyErricsson, Motorola web design"/>
+    <link href="/css/bootstrap.min.css" rel='stylesheet' type='text/css'/>
+    <link href="/css/style.css" rel='stylesheet' type='text/css'/>
+    <link href="/css/font-awesome.css" rel="stylesheet"/>
+    <script src="/js/jquery.min.js"></script>
+    <link href='http://fonts.useso.com/css?family=Roboto:400,100,300,500,700,900' rel='stylesheet' type='text/css'/>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/myUtil.js"></script>
+
+    <script th:inline="javascript">
+
+
+        var org_password;
+        var new_password;
+        var ret_password;
+
+        window.onload = function () {
+            org_password = $('#org_password');
+            new_password = $('#new_password');
+            ret_password = $('#ret_password');
+            /*<![CDATA[*/
+
+            switch ([[${curStatus.status}]]) {
+                case 1:
+                    showBar(new_password, "Account or password isn't correct.");
+                    break;
+                case 2:
+                    showBar(new_password, "Character is not valid. Only a-z, A-Z and _");
+                    break;
+            }
+
+            /*]]>*/
+        };
+
+        addEventListener("load", function () {
+            setTimeout(hideURLbar, 0);
+        }, false);
+        function hideURLbar() {
+            window.scrollTo(0, 1);
+        }
+
+        function validate() {
+            var ret = checkEmpty([org_password, new_password, ret_password]);
+            if (!ret) return ret;
+            if (new_password.val() != ret_password.val()) {
+                ret = false;
+                showBar(ret_password, "Passwords don't match.");
+            }
+            return ret;
+        }
+
+    </script>
+</head>
+<body>
+<div id="wrapper">
+    <nav th:replace="index.html :: navigator">
+
+    </nav>
+    <div id="page-wrapper">
+        <div class="col-md-12 graphs">
+            <div class="xs">
+                <h3>Device Registration</h3>
+
+                <div class="panel-body">
+
+                    <form action="/device/register.do" method="post" role="form" class="form-horizontal"
+                          onsubmit="return validate()">
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Device Name</label>
+                            <div class="col-md-8">
+                                <div class="input-group">
+									<span class="input-group-addon">
+										<i class="fa fa-key"></i>
+									</span>
+                                    <input type="text" class="form-control1"
+                                           name="device_name" placeholder="name" data-toggle="popover"
+                                           data-placement="right"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-sm-8 col-sm-offset-2">
+                                    <input type="submit" class="btn-success btn" value="submit"/>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+            <div th:replace="index.html :: footer">
+            </div>
+        </div>
+    </div>
+</div>
+<link href="css/custom.css" rel="stylesheet"/>
+<script src="js/metisMenu.min.js"></script>
+<script src="js/custom.js"></script>
+</body>
+</html>

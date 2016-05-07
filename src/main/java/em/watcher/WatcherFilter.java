@@ -11,10 +11,10 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @Component
-public class ManageFilter implements Filter {
-    private Logger logger = Logger.getLogger(ManageFilter.class);
+public class WatcherFilter implements Filter {
+    private Logger logger = Logger.getLogger(WatcherFilter.class);
 
-    public ManageFilter() {
+    public WatcherFilter() {
     }
 
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -26,7 +26,7 @@ public class ManageFilter implements Filter {
         HttpSession session = req.getSession(true);
         String servletPath = req.getServletPath();
         if (session.getAttribute(Sessionable.Status) == null) {
-            session.setAttribute(Sessionable.Status, new ManageStatus());
+            session.setAttribute(Sessionable.Status, new WatcherStatus());
         }
 
         if (!servletPath.endsWith(".html") && !servletPath.endsWith(".do")) {

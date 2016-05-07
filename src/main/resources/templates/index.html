@@ -38,7 +38,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="index.html">Stock Management</a>
+            <a class="navbar-brand" href="/index.html">Watcher</a>
         </div>
 
         <ul class="nav navbar-nav navbar-right">
@@ -60,7 +60,14 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                         <a href="/index.html"><i class="fa fa-dashboard fa-fw nav_icon"></i>Home</a>
                     </li>
                     <li>
-                        <a href="/add_stock.html"><i class="fa fa-check-square-o nav_icon"></i>Add Stock</a>
+                        <a href="/register_device.html"><i class="fa fa-check-square-o nav_icon"></i>Register device</a>
+                    </li>
+                    <li>
+                        <a href="/register_report.html"><i class="fa fa-check-square-o nav_icon"></i>Register report</a>
+                    </li>
+                    <li>
+                        <a href="/register_control.html"><i class="fa fa-check-square-o nav_icon"></i>Register
+                            control</a>
                     </li>
                 </ul>
             </div>
@@ -72,33 +79,53 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
             <div class="xs content_bottom">
                 <h3>Home</h3>
                 <div class="bs-example4" data-example-id="contextual-table">
-                    <table class="table">
+                    <table class="table table-bordered">
                         <thead>
                         <tr>
-                            <th>Stock code</th>
-                            <th>Stock name</th>
-                            <th>Stock price</th>
-                            <th>Surging limit(New)</th>
-                            <th>Decline limit(New)</th>
-                            <th>Least price</th>
-                            <th>Hight price</th>
-                            <th>State</th>
+                            <th>Device id</th>
+                            <th>Device name</th>
                         </tr>
                         </thead>
-                        <tr th:class="${rowStat.odd} ? 'active' : 'success'" th:each="stock,rowStat : ${stocks}">
-                            <th scope="row">
-                                <a th:inline="text" th:href="@{'/order/'+${stock.code}+'.html'}">
-                                    [[${stock.code}]]
-                                    <i class="fa fa-paperclip"></i>
-                                </a>
-                            </th>
-                            <td th:text="${stock.name}"></td>
-                            <td th:text="${stock.price}"></td>
-                            <td th:text="${stock.surging_range*100+'%('+stock.surging_range_set*100+'%)'}"></td>
-                            <td th:text="${stock.decline_range*100+'%('+stock.decline_range_set*100+'%)'}"></td>
-                            <td th:text="${stock.least_price}"></td>
-                            <td th:text="${stock.highest_price}"></td>
-                            <td th:text="${stock.state}"></td>
+                        <tr th:class="${rowStat.odd} ? 'active' : 'success'"
+                            th:each="device,rowStat : ${curUser.getDevices()}">
+                            <th scope="row" th:text="${device.getId()}"></th>
+                            <td th:text="${device.getName()}"></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="bs-example4" data-example-id="contextual-table">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Control id</th>
+                            <th>Control name</th>
+                            <th>Control fields</th>
+                        </tr>
+                        </thead>
+                        <tr th:class="${rowStat.odd} ? 'active' : 'success'"
+                            th:each="control,rowStat : ${curUser.getControls()}">
+                            <th scope="row" th:text="${control.getId()}"></th>
+                            <td th:text="${control.getName()}"></td>
+                            <td th:text="${control.getType(fields)}" th:each="fields : ${control.getField()}"></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="bs-example4" data-example-id="contextual-table">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Report id</th>
+                            <th>Report name</th>
+                            <th>Report fields</th>
+                        </tr>
+                        </thead>
+                        <tr th:class="${rowStat.odd} ? 'active' : 'success'"
+                            th:each="report,rowStat : ${curUser.getReports()}">
+                            <th scope="row" th:text="${report.getId()}"></th>
+                            <td th:text="${report.getName()}"></td>
+                            <td th:text="${report.getType(fields)}" th:each="fields : ${report.getField()}"></td>
                         </tr>
                     </table>
                 </div>

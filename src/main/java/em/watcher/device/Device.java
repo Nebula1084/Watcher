@@ -1,17 +1,29 @@
 package em.watcher.device;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "device")
 public class Device {
-    private int deviceId;
-    private char[] deviceKey;
-    private boolean isOnline;
 
-    public Device(int deviceId) {
-        this.deviceId = deviceId;
-        isOnline = false;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
+    private String name;
+
+    public Device() {
+
     }
 
-    public void authenticate(char[] deviceKey) {
-        isOnline = true;
+    public Device(String name) {
+        this.name = name;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

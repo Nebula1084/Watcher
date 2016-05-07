@@ -1,6 +1,6 @@
 package em.watcher.conroller;
 
-import em.watcher.ManageStatus;
+import em.watcher.WatcherStatus;
 import em.watcher.Sessionable;
 import em.watcher.user.PassMatcher;
 import em.watcher.user.User;
@@ -35,7 +35,7 @@ public class UserController implements Sessionable {
     @RequestMapping(value = {"/login.do"}, method = {RequestMethod.POST}
     )
     public String login(@Valid @ModelAttribute("user") User user, BindingResult result,
-                        @ModelAttribute(Sessionable.Status) ManageStatus status, Model model) {
+                        @ModelAttribute(Sessionable.Status) WatcherStatus status, Model model) {
         if (result.hasErrors()) {
             this.logger.info(result);
             status.status = 2;
@@ -57,7 +57,7 @@ public class UserController implements Sessionable {
 
     @RequestMapping(value = {"/register.do"}, method = {RequestMethod.POST})
     public String register(@Valid @ModelAttribute("user") User user, BindingResult result,
-                           @ModelAttribute(Sessionable.Status) ManageStatus status, Model model) {
+                           @ModelAttribute(Sessionable.Status) WatcherStatus status, Model model) {
         if (result.hasErrors()) {
             this.logger.info(result);
             status.status = 2;
@@ -71,7 +71,7 @@ public class UserController implements Sessionable {
                 return "redirect:/index.html";
             } else {
                 this.logger.info(user + " register failed");
-                status.status = ManageStatus.account_aldeady_exist;
+                status.status = WatcherStatus.account_aldeady_exist;
                 return "redirect:/register.html";
             }
         }
@@ -85,14 +85,14 @@ public class UserController implements Sessionable {
 
 
     @RequestMapping(value = "/modify.do", method = RequestMethod.POST)
-    public String modify(@ModelAttribute(Sessionable.User) User user, @ModelAttribute(Sessionable.Status) ManageStatus status,
+    public String modify(@ModelAttribute(Sessionable.User) User user, @ModelAttribute(Sessionable.Status) WatcherStatus status,
                          @RequestParam("org") String orgP, @RequestParam("new") String newP) {
         if (passMatcher.validate(orgP)) {
-            status.status = ManageStatus.invalid_char;
+            status.status = WatcherStatus.invalid_char;
             return "redirect:/profile.html";
         }
         if (passMatcher.validate(orgP)) {
-            status.status = ManageStatus.invalid_char;
+            status.status = WatcherStatus.invalid_char;
             return "redirect:/profile.html";
         }
         if (user.getPassword().equals(orgP)) {
@@ -100,7 +100,7 @@ public class UserController implements Sessionable {
             userService.save(user);
             this.logger.info(user + " modify password successes");
         } else {
-            status.status = ManageStatus.account_or_password_error;
+            status.status = WatcherStatus.account_or_password_error;
             this.logger.info(user + " modify password failed");
         }
         return "redirect:/profile.html";
