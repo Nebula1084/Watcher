@@ -2,6 +2,7 @@ package em.watcher.conroller;
 
 import em.watcher.Sessionable;
 import em.watcher.WatcherPacket;
+import em.watcher.WatcherStatus;
 import em.watcher.control.Control;
 import em.watcher.device.Device;
 import em.watcher.report.Report;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashSet;
+import java.util.Set;
 
 @Controller
 public class WatcherConroller implements Sessionable {
@@ -35,44 +38,64 @@ public class WatcherConroller implements Sessionable {
     }
 
     @RequestMapping(value = "/device/register.do", method = RequestMethod.POST)
-    public String deviceRegister(@RequestParam(value = "device_name") String device_name, @ModelAttribute(Sessionable.User) User user) {
-
-        if (passMatcher.validate(device_name)){
-            Device device=new Device(device_name);
-            userService.registerDevice(user,device);
+    public String deviceRegister(@RequestParam(value = "name_fields") String device_name,
+                                 @ModelAttribute(Sessionable.User) User user, Model model,
+                                 @ModelAttribute(Sessionable.Status) WatcherStatus status) {
+        Device device;
+        try {
+            if (!passMatcher.validate(device_name))
+                throw new Exception("Device name contains invalid character.");
+            device = new Device(device_name);
+            model.addAttribute(Sessionable.User, userService.registerDevice(user, device));
+            return "redirect:" + WatcherView.indexPage;
+        } catch (Exception e) {
+            status.setException(e);
+            return "redirect:" + WatcherView.deviceRgstPage;
         }
-        return "redirect:" + WatcherView.indexPage;
     }
 
     @RequestMapping(value = "/report/register.do", method = RequestMethod.POST)
-    public String reportRegister(HttpServletRequest httpRequest, @ModelAttribute(Sessionable.User) User user) {
-        Report report = getReport(httpRequest);
-        if (report != null)
-            userService.registerReport(user, report);
-        return "redirect:" + WatcherView.indexPage;
+    public String reportRegister(HttpServletRequest httpRequest, @ModelAttribute(Sessionable.User) User user, Model model,
+                                 @ModelAttribute(Sessionable.Status) WatcherStatus status) {
+        Report report;
+        try {
+            report = getReport(httpRequest);
+            model.addAttribute(Sessionable.User, userService.registerReport(user, report));
+            return "redirect:" + WatcherView.indexPage;
+        } catch (Exception e) {
+            status.setException(e);
+            return "redirect:" + WatcherView.reportRgstPage;
+        }
     }
 
     @RequestMapping(value = "/control/register.do", method = RequestMethod.POST)
-    public String controlRegister(HttpServletRequest httpRequest, @ModelAttribute(Sessionable.User) User user) {
-        Control control = getControl(httpRequest);
-        if (control != null)
-            userService.registerControl(user, control);
-        return "redirect:" + WatcherView.indexPage;
+    public String controlRegister(HttpServletRequest httpRequest, @ModelAttribute(Sessionable.User) User user, Model model,
+                                  @ModelAttribute(Sessionable.Status) WatcherStatus status) {
+        Control control;
+        try {
+            control = getControl(httpRequest);
+            model.addAttribute(Sessionable.User, userService.registerControl(user, control));
+            return "redirect:" + WatcherView.indexPage;
+        } catch (Exception e) {
+            status.setException(e);
+            return "redirect:" + WatcherView.controlRgstPage;
+        }
     }
 
-    private Control getControl(HttpServletRequest request) {
+    private Control getControl(HttpServletRequest request) throws Exception {
         Control control = new Control();
         return (Control) getPacket(request, control);
     }
 
-    private Report getReport(HttpServletRequest request) {
+    private Report getReport(HttpServletRequest request) throws Exception {
         Report report = new Report();
         return (Report) getPacket(request, report);
     }
 
-    private WatcherPacket getPacket(HttpServletRequest request, WatcherPacket packet) {
+    private WatcherPacket getPacket(HttpServletRequest request, WatcherPacket packet) throws Exception {
         String name_fields = request.getParameter("name_fields");
-        if (!passMatcher.validate(name_fields)) return null;
+        Set<String> nameSet = new HashSet<>();
+        if (!passMatcher.validate(name_fields)) throw new Exception("name contains invalid character.");
         packet.setName(name_fields);
         int paraNum = (request.getParameterMap().size() - 1) / 3;
         String name, type, length;
@@ -81,15 +104,13 @@ public class WatcherConroller implements Sessionable {
             type = "type" + i;
             length = "length" + i;
             name = request.getParameter(name);
-            if (!passMatcher.validate(name)) return null;
+            if (!passMatcher.validate(name)) throw new Exception("field names contains invalid character.");
+            if (nameSet.contains(name)) throw new Exception("field names duplicate.");
+            nameSet.add(name);
             type = request.getParameter(type);
-            if (!passMatcher.validate(type)) return null;
+            if (!passMatcher.validate(type)) throw new Exception("field types contains invalid character.");
             length = request.getParameter(length);
-            try {
-                packet.addField(name, type, Integer.valueOf(length));
-            } catch (Exception e) {
-                return null;
-            }
+            packet.addField(name, type, Integer.valueOf(length));
         }
         return packet;
     }

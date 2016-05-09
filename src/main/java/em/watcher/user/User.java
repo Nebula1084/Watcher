@@ -6,8 +6,7 @@ import em.watcher.report.Report;
 
 import javax.jws.soap.SOAPBinding;
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 public class User {
@@ -16,19 +15,19 @@ public class User {
     private String password = "";
     private String fullName = "";
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
-    private Set<Device> devices;
+    @OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    private List<Device> devices;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
-    private Set<Control> controls;
+    @OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    private List<Control> controls;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
-    private Set<Report> reports;
+    @OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    private List<Report> reports;
 
     public User() {
-        this.devices = new HashSet<>();
-        this.controls = new HashSet<>();
-        this.reports = new HashSet<>();
+        this.devices = new LinkedList<>();
+        this.controls = new LinkedList<>();
+        this.reports = new LinkedList<>();
     }
 
     public User(String account, String password, String fullName) {
@@ -74,15 +73,16 @@ public class User {
         this.reports.add(report);
     }
 
-    public Set<Device> getDevices() {
+    public List<Device> getDevices() {
         return devices;
     }
 
-    public Set<Control> getControls() {
+    public List<Control> getControls() {
         return controls;
     }
 
-    public Set<Report> getReports() {
+    public List<Report> getReports() {
+
         return reports;
     }
 

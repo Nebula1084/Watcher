@@ -18,16 +18,15 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
         var i;
         var name_list = [];
         var count = 1;
+        var name_fields;
 
         window.onload = function () {
+            name_fields = $("[name='name_fields']");
             /*<![CDATA[*/
 
             switch ([[${curStatus.status}]]) {
-                case 1:
-                    showBar(new_password, "Account or password isn't correct.");
-                    break;
-                case 2:
-                    showBar(new_password, "Character is not valid. Only a-z, A-Z and _");
+                case 4:
+                    showBar(name_fields, [[${curStatus.getInfo()}]]);
                     break;
             }
 
@@ -76,8 +75,8 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
         </div>
     </div>
 </div>
-<link href="css/custom.css" rel="stylesheet"/>
-<script src="js/metisMenu.min.js"></script>
-<script src="js/custom.js"></script>
+<link href="/css/custom.css" rel="stylesheet"/>
+<script src="/js/metisMenu.min.js"></script>
+<script src="/js/custom.js"></script>
 </body>
 </html>

@@ -1,20 +1,22 @@
 package em.watcher;
 
+import em.watcher.device.Device;
+
 import javax.persistence.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 @MappedSuperclass
 public abstract class WatcherPacket {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private Map<String, String> types;
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private Map<String, Integer> lengths;
 
     public final static String TYPE_INT = "int";
@@ -32,6 +34,7 @@ public abstract class WatcherPacket {
         this.lengths = new HashMap<>();
         this.name = name;
     }
+
 
     public Long getId() {
         return id;
@@ -74,15 +77,24 @@ public abstract class WatcherPacket {
     }
 
     public Boolean isType(String type) {
-        if (type.equals(TYPE_INT))
-            return true;
-        else if (type.equals(TYPE_FLOAT))
-            return true;
-        else if (type.equals(TYPE_CHAR))
-            return true;
-        else if (type.equals(TYPE_STRING))
-            return true;
-        else return false;
+        switch (type) {
+            case TYPE_INT:
+                return true;
+            case TYPE_FLOAT:
+                return true;
+            case TYPE_CHAR:
+                return true;
+            case TYPE_STRING:
+                return true;
+            default:
+                return false;
+        }
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof WatcherPacket)) return false;
+        WatcherPacket packet = (WatcherPacket) obj;
+        return Objects.equals(this.name, packet.name);
+    }
 }

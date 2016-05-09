@@ -45,25 +45,31 @@ public class UserService {
     }
 
     @Transactional
-    public void save(User user) {
-        this.userRepository.save(user);
+    public User save(User user) {
+        return this.userRepository.save(user);
     }
 
     @Transactional
-    public void registerDevice(User user, Device device) {
+    public User registerDevice(User user, Device device) throws Exception {
+        if (user.getDevices().contains(device))
+            throw new Exception("Device name duplicate.");
         user.addDevice(device);
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     @Transactional
-    public void registerControl(User user, Control control) {
+    public User registerControl(User user, Control control) throws Exception {
+        if (user.getControls().contains(control))
+            throw new Exception("Control name duplicate.");
         user.addControl(control);
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     @Transactional
-    public void registerReport(User user, Report report) {
+    public User registerReport(User user, Report report) throws Exception {
+        if (user.getReports().contains(report))
+            throw new Exception("Report name duplicate");
         user.addReport(report);
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 }

@@ -17,22 +17,15 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
     <script th:inline="javascript">
 
 
-        var org_password;
-        var new_password;
-        var ret_password;
+        var name_fields;
 
         window.onload = function () {
-            org_password = $('#org_password');
-            new_password = $('#new_password');
-            ret_password = $('#ret_password');
+            name_fields = $("[name='name_fields']");
             /*<![CDATA[*/
 
             switch ([[${curStatus.status}]]) {
-                case 1:
-                    showBar(new_password, "Account or password isn't correct.");
-                    break;
-                case 2:
-                    showBar(new_password, "Character is not valid. Only a-z, A-Z and _");
+                case 4:
+                    showBar(name_fields, [[${curStatus.getInfo()}]]);
                     break;
             }
 
@@ -47,13 +40,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
         }
 
         function validate() {
-            var ret = checkEmpty([org_password, new_password, ret_password]);
-            if (!ret) return ret;
-            if (new_password.val() != ret_password.val()) {
-                ret = false;
-                showBar(ret_password, "Passwords don't match.");
-            }
-            return ret;
+            return checkEmpty([name_fields]);
         }
 
     </script>
@@ -81,7 +68,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 										<i class="fa fa-key"></i>
 									</span>
                                     <input type="text" class="form-control1"
-                                           name="device_name" placeholder="name" data-toggle="popover"
+                                           name="name_fields" placeholder="name" data-toggle="popover"
                                            data-placement="right"/>
                                 </div>
                             </div>

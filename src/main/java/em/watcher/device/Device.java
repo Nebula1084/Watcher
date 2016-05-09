@@ -1,6 +1,7 @@
 package em.watcher.device;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "device")
@@ -8,7 +9,7 @@ public class Device {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private Long id;
     private String name;
 
     public Device() {
@@ -19,11 +20,18 @@ public class Device {
         this.name = name;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Device)) return false;
+        Device device = (Device) obj;
+        return Objects.equals(this.name, device.name);
     }
 }
