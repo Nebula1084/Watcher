@@ -1,12 +1,14 @@
 package em.watcher.control;
 
 import em.watcher.PacketValidator;
+import em.watcher.device.Device;
 import em.watcher.device.DeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static em.watcher.conroller.PacketController.*;
 
@@ -14,40 +16,93 @@ import static em.watcher.conroller.PacketController.*;
 public class ControlService {
     @Autowired
     private DeviceService deviceService;
-
     @Autowired
     private ControlDefRepository controlDefRepository;
-
     @Autowired
     private PacketValidator packetValidator;
+    @Autowired
+    private ControlPacketPool packetPool;
+    @Autowired
+    private ControlPacketRepository packetRepository;
 
-    public void control(Map<String, String> params) throws Exception {
+
+
+    public ControlPacket control(Map<String, String> params) throws Exception {
         Long authId = Long.valueOf(params.get(AUTH_ID));
         String authKey = params.get(AUTH_KEY);
-        Long deviceId = Long.valueOf(params.get(DEVICE_ID));
         Long reportId = Long.valueOf(params.get(CONTROL_ID));
 
         ControlDef controlDef;
+        controlDef = this.getControlDef(reportId);
+
         if (!deviceService.authenticate(authId, authKey))
             throw new Exception("Authenticate failed.");
-        if (!deviceService.isExist(deviceId))
-            throw new Exception("Device " + deviceId + " doesn't exist.");
-        controlDef = this.getControlDef(reportId);
+
         packetValidator.validatePacket(params, controlDef);
+
+        Long deviceId = Long.valueOf(params.get(DEVICE_ID));
+        Device device = deviceService.findDevice(deviceId);
+
         ControlPacket packet = new ControlPacket();
-        for (String field : controlDef.getField()) {
-            packet.putField(field, params.get(field));
+        packet.setAuthId(authId);
+        packet.setDeviceId(deviceId);
+        packet.setPacketDef(controlDef);
+        packet.setSR(params.get(SR));
+        if (packet.getSR().equals(ControlPacket.Send))
+            for (String field : controlDef.getField()) {
+                packet.putField(field, params.get(field));
+            }
+        packet = this.recordControl(controlDef, packet);
+        switch (packet.getSR()) {
+            case ControlPacket.Send:
+                Long targetId = Long.valueOf(params.get(TARGET_ID));
+                Device target = deviceService.findDevice(targetId);
+                packet.setTargetId(targetId);
+                return sendControl(target, packet);
+            case ControlPacket.Recv:
+                return recvControl(device, packet);
+            default:
+                return null;
         }
-        this.control(controlDef, packet);
     }
 
-    public void control(Long id, ControlPacket controlPacket) throws Exception {
-        control(getControlDef(id), controlPacket);
+    private ControlPacket sendControl(Device device, ControlPacket packet) {
+        synchronized (packet) {
+            packetPool.offer(device, packet);
+            try {
+                packet.wait(1000);
+                packetRepository.save(packet);
+                if (!Objects.equals(packet.getFellowPacketId(), ControlPacket.NO_FELLOW)) {
+                    return packetRepository.findById(packet.getFellowPacketId()).get(0);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
-    public void control(ControlDef controlDef, ControlPacket controlPacket) {
+    private ControlPacket recvControl(Device device, ControlPacket packet) {
+        ControlPacket recvPacket = packetPool.poll(device);
+        if (recvPacket == null)
+            return null;
+        synchronized (recvPacket) {
+            recvPacket.setFellowPacketId(packet.getId());
+            packet.setFellowPacketId(recvPacket.getId());
+            packetRepository.save(packet);
+            recvPacket.notify();
+        }
+        return recvPacket;
+    }
+
+    public void recordControl(Long id, ControlPacket controlPacket) throws Exception {
+        recordControl(getControlDef(id), controlPacket);
+    }
+
+    public ControlPacket recordControl(ControlDef controlDef, ControlPacket controlPacket) {
         controlDef.addControl(controlPacket);
-        controlDefRepository.save(controlDef);
+        controlDef = controlDefRepository.save(controlDef);
+        return controlDef.getLast();
     }
 
     public ControlDef getControlDef(Long id) throws Exception {

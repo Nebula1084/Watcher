@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,7 +29,7 @@ public class UserService {
     @Transactional
     public User register(User user) throws Exception {
         List<User> users = this.userRepository.findByAccount(user.getAccount());
-        if (!users.isEmpty()){
+        if (!users.isEmpty()) {
             System.out.println(users);
             throw new Exception("Account " + user.getAccount() + " already exists.");
         }
@@ -54,7 +55,7 @@ public class UserService {
 
     @Transactional
     public User registerDevice(User user, Device device) throws Exception {
-        if (user.getDevices().contains(device))
+        if (user.getReportDefs().stream().filter(device1 -> Objects.equals(device.getName(), device1.getName())).count() > 0)
             throw new Exception("Device name duplicate.");
         user.addDevice(device);
         return userRepository.save(user);
@@ -62,7 +63,7 @@ public class UserService {
 
     @Transactional
     public User registerControl(User user, ControlDef controlDef) throws Exception {
-        if (user.getControlDefs().contains(controlDef))
+        if (user.getReportDefs().stream().filter(controlDef1 -> Objects.equals(controlDef.getName(), controlDef1.getName())).count() > 0)
             throw new Exception("ControlDef name duplicate.");
         user.addControl(controlDef);
         return userRepository.save(user);
@@ -70,8 +71,8 @@ public class UserService {
 
     @Transactional
     public User registerReport(User user, ReportDef reportDef) throws Exception {
-        if (user.getReportDefs().contains(reportDef))
-            throw new Exception("ReportDef name duplicate");
+        if (user.getReportDefs().stream().filter(reportDef1 -> Objects.equals(reportDef.getName(), reportDef1.getName())).count() > 0)
+            throw new Exception("ReportDef name duplicate.");
         user.addReport(reportDef);
         return userRepository.save(user);
     }

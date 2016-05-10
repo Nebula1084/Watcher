@@ -97,6 +97,11 @@ public abstract class WatcherPacketDef {
     public boolean equals(Object obj) {
         if (!(obj instanceof WatcherPacketDef)) return false;
         WatcherPacketDef packet = (WatcherPacketDef) obj;
-        return Objects.equals(this.name, packet.name);
+        return Objects.equals(this.id, packet.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Math.toIntExact(this.id);
     }
 }

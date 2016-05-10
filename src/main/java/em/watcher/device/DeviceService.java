@@ -23,4 +23,11 @@ public class DeviceService {
         return !devices.isEmpty();
     }
 
+    public Device findDevice(Long id) throws Exception {
+        List<Device> devices = deviceRepository.findById(id);
+        if (devices.isEmpty())
+            throw new Exception("Device " + id + " doesn't exist.");
+        return devices.get(0);
+    }
+
 }

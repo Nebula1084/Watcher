@@ -35,6 +35,9 @@ public class ReportService {
         reportDef = this.getReportDef(reportId);
         packetValidator.validatePacket(params, reportDef);
         ReportlPacket packet = new ReportlPacket();
+        packet.setAuthId(authId);
+        packet.setDeviceId(deviceId);
+        packet.setPacketDef(reportDef);
         for (String field : reportDef.getField()) {
             packet.putField(field, params.get(field));
         }

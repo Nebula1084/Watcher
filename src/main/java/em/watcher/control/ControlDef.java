@@ -23,7 +23,11 @@ public class ControlDef extends WatcherPacketDef {
         packets = new LinkedList<>();
     }
 
-    public void addControl(ControlPacket packet){
+    public void addControl(ControlPacket packet) {
         packets.add(packet);
+    }
+
+    public ControlPacket getLast() {
+        return packets.get(packets.size() - 1);
     }
 }

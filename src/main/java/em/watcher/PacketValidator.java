@@ -30,6 +30,15 @@ public class PacketValidator {
         else if (packetDef instanceof ControlDef) {
             testSet.add(CONTROL_ID);
             testSet.add(SR);
+            if (!params.keySet().contains(SR))
+                throw new IllegalArgumentException("Parameter format is not correct. Expect sr");
+            String sr = params.get(SR);
+            if (!sr.equals(ControlPacket.Recv) && !sr.equals(ControlPacket.Send))
+                throw new IllegalArgumentException("SR is not S or R.");
+            if (sr.equals(ControlPacket.Recv))
+                fieldSet = new HashSet<>();
+            else
+                testSet.add(TARGET_ID);
         }
         testSet.addAll(fieldSet);
         Set<String> requestSet = params.keySet();
@@ -39,11 +48,6 @@ public class PacketValidator {
             String value = params.get(field);
             if (!contentMatcher.validate(value))
                 throw new IllegalArgumentException("Parameter contains invalid character.");
-        }
-        if (packetDef instanceof ControlDef) {
-            String sr = params.get(SR);
-            if (!sr.equals(ControlPacket.Recv) && !sr.equals(ControlPacket.Send))
-                throw new IllegalArgumentException("SR is not S or R.");
         }
         return true;
     }

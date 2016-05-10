@@ -43,7 +43,12 @@ public class Device {
     public boolean equals(Object obj) {
         if (!(obj instanceof Device)) return false;
         Device device = (Device) obj;
-        return Objects.equals(this.name, device.name);
+        return Objects.equals(this.id, device.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Math.toIntExact(id);
     }
 
     @Override

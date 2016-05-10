@@ -3,10 +3,7 @@ package em.watcher;
 import javax.persistence.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @MappedSuperclass
 abstract public class WatcherPacket {
@@ -18,6 +15,7 @@ abstract public class WatcherPacket {
     private Date time;
     @ElementCollection(fetch = FetchType.EAGER)
     private Map<String, String> fields;
+
 
     public WatcherPacket() {
         time = Calendar.getInstance().getTime();
@@ -55,5 +53,17 @@ abstract public class WatcherPacket {
     public String getTime() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         return dateFormat.format(time);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof WatcherPacket)) return false;
+        WatcherPacket packet = (WatcherPacket) obj;
+        return Objects.equals(this.id, packet.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Math.toIntExact(id);
     }
 }
