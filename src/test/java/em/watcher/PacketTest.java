@@ -2,6 +2,7 @@ package em.watcher;
 
 import em.watcher.conroller.PacketController;
 import em.watcher.control.ControlDef;
+import em.watcher.control.ControlService;
 import em.watcher.device.Device;
 import em.watcher.device.DeviceRepository;
 import em.watcher.device.DeviceService;
@@ -28,12 +29,13 @@ import org.springframework.util.MultiValueMap;
 
 import static em.watcher.conroller.PacketController.*;
 import static em.watcher.conroller.PacketController.CONTROL_ID;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration(classes = App.class)
 @Rollback
-@Transactional
 public abstract class PacketTest {
     @Autowired
     PacketController packetController;
@@ -43,6 +45,8 @@ public abstract class PacketTest {
     DeviceService deviceService;
     @Autowired
     DeviceRepository deviceRepository;
+    @Autowired
+    ControlService controlService;
     protected Logger logger = Logger.getLogger(ReportTest.class);
     protected MockMvc mockMvc;
     protected User user;
@@ -53,30 +57,41 @@ public abstract class PacketTest {
     @Before
     public void setup() throws Exception {
         this.mockMvc = MockMvcBuilders.standaloneSetup(this.packetController).build();
-        this.user = this.userService.register(new User("user111", "12443", "123"));
-        Assert.assertThat(this.user != null, CoreMatchers.is(true));
+        Integer i = 20;
+        while (true) {
+            try {
+                this.user = this.userService.register(new User("user" + i, "12443", "123"));
+                break;
+            } catch (Exception e) {
+                i++;
+            }
+        }
+        assertThat(this.user != null, is(true));
         this.user = this.userService.registerDevice(this.user, new Device("dev1"));
         this.device = this.user.getDevices().get(0);
         this.user = this.userService.registerDevice(this.user, new Device("dev2"));
         this.target = this.user.getDevices().get(1);
-        Assert.assertThat(this.device != null, CoreMatchers.is(true));
+        assertThat(this.device != null, is(true));
         System.out.println("----------------------------------");
         this.logger.error(this.device);
         System.out.println(this.deviceRepository.findAll());
         System.out.println();
-        Assert.assertThat(this.deviceService.isExist(this.device.getId()), CoreMatchers.is(true));
+        assertThat(this.deviceService.isExist(this.device.getId()), is(true));
         this.reportDef = new ReportDef("report1");
         this.reportDef.addField("f1", WatcherPacketDef.TYPE_INT, 4);
         this.reportDef.addField("f2", WatcherPacketDef.TYPE_STRING, 10);
         this.user = this.userService.registerReport(this.user, this.reportDef);
         this.reportDef = this.user.getReportDefs().get(0);
-        Assert.assertThat(this.reportDef == null, CoreMatchers.not(true));
+        assertThat(this.reportDef == null, not(true));
         this.controlDef = new ControlDef("control1");
         this.controlDef.addField("f1", WatcherPacketDef.TYPE_INT, 4);
         this.controlDef.addField("f2", WatcherPacketDef.TYPE_STRING, 10);
         this.controlDef.addField("f3", WatcherPacketDef.TYPE_CHAR, 1);
         this.user = this.userService.registerControl(this.user, this.controlDef);
+        System.out.println("--------------------------------------------");
+        System.out.println(this.user.getControlDefs());
         this.controlDef = this.user.getControlDefs().get(0);
+        assertThat(controlService.getControlDef(controlDef.getId()) == null, not(true));
     }
 
     protected MultiValueMap<String, String> getMvm(Long id, WatcherPacketDef packetDef) {

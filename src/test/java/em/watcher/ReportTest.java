@@ -2,6 +2,8 @@
 package em.watcher;
 
 import org.junit.Test;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -13,6 +15,8 @@ public class ReportTest extends PacketTest {
 
 
     @Test
+    @Rollback
+    @Transactional
     public void testReport() throws Exception {
         MultiValueMap<String, String> mvm = this.getMvm(this.device.getId(), reportDef);
         mvm.add("f1", "12");

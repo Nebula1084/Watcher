@@ -12,14 +12,13 @@ import javax.persistence.ManyToOne;
 @Entity
 public class ControlPacket extends WatcherPacket {
     private String SR;
-    @ManyToOne(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
-    private ControlDef packetDef;
-    private Long targetId;
+    private Long targetId = NO_TARGET;
     private Long fellowPacketId = NO_FELLOW;
 
     public static final String Send = "S";
     public static final String Recv = "R";
     public static final Long NO_FELLOW = -1L;
+    public static final Long NO_TARGET = -1L;
 
     public ControlPacket() {
         super();
@@ -31,10 +30,6 @@ public class ControlPacket extends WatcherPacket {
 
     public String getSR() {
         return SR;
-    }
-
-    public void setPacketDef(ControlDef packetDef) {
-        this.packetDef = packetDef;
     }
 
     public void setTargetId(Long targetId) {

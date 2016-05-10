@@ -10,7 +10,7 @@ import java.util.List;
 @Entity
 public class ControlDef extends WatcherPacketDef {
 
-    @OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     private List<ControlPacket> packets;
 
     public ControlDef() {

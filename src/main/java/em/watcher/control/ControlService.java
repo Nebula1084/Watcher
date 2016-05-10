@@ -26,14 +26,13 @@ public class ControlService {
     private ControlPacketRepository packetRepository;
 
 
-
     public ControlPacket control(Map<String, String> params) throws Exception {
         Long authId = Long.valueOf(params.get(AUTH_ID));
         String authKey = params.get(AUTH_KEY);
-        Long reportId = Long.valueOf(params.get(CONTROL_ID));
+        Long controlId = Long.valueOf(params.get(CONTROL_ID));
 
         ControlDef controlDef;
-        controlDef = this.getControlDef(reportId);
+        controlDef = this.getControlDef(controlId);
 
         if (!deviceService.authenticate(authId, authKey))
             throw new Exception("Authenticate failed.");
@@ -46,7 +45,6 @@ public class ControlService {
         ControlPacket packet = new ControlPacket();
         packet.setAuthId(authId);
         packet.setDeviceId(deviceId);
-        packet.setPacketDef(controlDef);
         packet.setSR(params.get(SR));
         if (packet.getSR().equals(ControlPacket.Send))
             for (String field : controlDef.getField()) {
@@ -70,9 +68,11 @@ public class ControlService {
         synchronized (packet) {
             packetPool.offer(device, packet);
             try {
-                packet.wait(1000);
+                packet.wait(10000);
                 packetRepository.save(packet);
-                if (!Objects.equals(packet.getFellowPacketId(), ControlPacket.NO_FELLOW)) {
+                if (Objects.equals(packet.getFellowPacketId(), ControlPacket.NO_FELLOW)) {
+                    packetPool.remove(device, packet);
+                } else {
                     return packetRepository.findById(packet.getFellowPacketId()).get(0);
                 }
             } catch (InterruptedException e) {
@@ -100,6 +100,7 @@ public class ControlService {
     }
 
     public ControlPacket recordControl(ControlDef controlDef, ControlPacket controlPacket) {
+//        controlPacket = packetRepository.save(controlPacket);
         controlDef.addControl(controlPacket);
         controlDef = controlDefRepository.save(controlDef);
         return controlDef.getLast();

@@ -50,6 +50,10 @@ abstract public class WatcherPacket {
         return fields.get(key);
     }
 
+    public Map<String, String> getFields() {
+        return fields;
+    }
+
     public String getTime() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         return dateFormat.format(time);

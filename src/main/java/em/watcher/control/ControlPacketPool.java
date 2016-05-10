@@ -21,8 +21,10 @@ public class ControlPacketPool {
         Deque<ControlPacket> packetDeque = pool.get(device);
         if (packetDeque == null) {
             synchronized (device) {
-                if (packetDeque == null)
+                if (packetDeque == null){
                     packetDeque = new LinkedBlockingDeque<>();
+                    pool.put(device, packetDeque);
+                }
             }
         }
         packetDeque.offer(controlPacket);

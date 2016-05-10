@@ -9,7 +9,7 @@ import java.util.List;
 @Entity
 public class ReportDef extends WatcherPacketDef {
 
-    @OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     private List<ReportlPacket> packets;
 
     public ReportDef() {
