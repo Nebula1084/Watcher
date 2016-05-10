@@ -5,6 +5,6 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public interface ReportRepository extends CrudRepository<User, Long> {
-    List<User> findByAccount(String account);
+public interface ReportDefRepository extends CrudRepository<ReportDef, Long> {
+    List<ReportDef> findById(Long Id);
 }

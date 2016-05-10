@@ -9,12 +9,21 @@ import java.net.Socket;
 
 @Component
 public class Mouse {
-    public final static int PORT = 10659;
+    public static int PORT = 10659;
 
     private ServerSocket serverSocket;
 
-    private Mouse() throws IOException {
-        serverSocket = new ServerSocket(Mouse.PORT);
+    private Mouse() {
+        while (true) {
+            try {
+                serverSocket = new ServerSocket(Mouse.PORT);
+                break;
+            } catch (IOException e) {
+                Mouse.PORT += 1;
+                e.printStackTrace();
+            }
+        }
+
         Thread thread = new Thread() {
 
             @Override

@@ -1,15 +1,14 @@
 package em.watcher.conroller;
 
 import em.watcher.Sessionable;
-import em.watcher.WatcherPacket;
+import em.watcher.WatcherPacketDef;
 import em.watcher.WatcherStatus;
-import em.watcher.control.Control;
+import em.watcher.control.ControlDef;
 import em.watcher.device.Device;
-import em.watcher.report.Report;
+import em.watcher.report.ReportDef;
 import em.watcher.user.PassMatcher;
 import em.watcher.user.User;
 import em.watcher.user.UserService;
-import org.jboss.logging.annotations.Pos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -54,13 +53,13 @@ public class WatcherConroller implements Sessionable {
         }
     }
 
-    @RequestMapping(value = "/report/register.do", method = RequestMethod.POST)
+    @RequestMapping(value = "/reportDef/register.do", method = RequestMethod.POST)
     public String reportRegister(HttpServletRequest httpRequest, @ModelAttribute(Sessionable.User) User user, Model model,
                                  @ModelAttribute(Sessionable.Status) WatcherStatus status) {
-        Report report;
+        ReportDef reportDef;
         try {
-            report = getReport(httpRequest);
-            model.addAttribute(Sessionable.User, userService.registerReport(user, report));
+            reportDef = getReport(httpRequest);
+            model.addAttribute(Sessionable.User, userService.registerReport(user, reportDef));
             return "redirect:" + WatcherView.indexPage;
         } catch (Exception e) {
             status.setException(e);
@@ -68,13 +67,13 @@ public class WatcherConroller implements Sessionable {
         }
     }
 
-    @RequestMapping(value = "/control/register.do", method = RequestMethod.POST)
+    @RequestMapping(value = "/controlDef/register.do", method = RequestMethod.POST)
     public String controlRegister(HttpServletRequest httpRequest, @ModelAttribute(Sessionable.User) User user, Model model,
                                   @ModelAttribute(Sessionable.Status) WatcherStatus status) {
-        Control control;
+        ControlDef controlDef;
         try {
-            control = getControl(httpRequest);
-            model.addAttribute(Sessionable.User, userService.registerControl(user, control));
+            controlDef = getControl(httpRequest);
+            model.addAttribute(Sessionable.User, userService.registerControl(user, controlDef));
             return "redirect:" + WatcherView.indexPage;
         } catch (Exception e) {
             status.setException(e);
@@ -82,17 +81,17 @@ public class WatcherConroller implements Sessionable {
         }
     }
 
-    private Control getControl(HttpServletRequest request) throws Exception {
-        Control control = new Control();
-        return (Control) getPacket(request, control);
+    private ControlDef getControl(HttpServletRequest request) throws Exception {
+        ControlDef controlDef = new ControlDef();
+        return (ControlDef) getPacket(request, controlDef);
     }
 
-    private Report getReport(HttpServletRequest request) throws Exception {
-        Report report = new Report();
-        return (Report) getPacket(request, report);
+    private ReportDef getReport(HttpServletRequest request) throws Exception {
+        ReportDef reportDef = new ReportDef();
+        return (ReportDef) getPacket(request, reportDef);
     }
 
-    private WatcherPacket getPacket(HttpServletRequest request, WatcherPacket packet) throws Exception {
+    private WatcherPacketDef getPacket(HttpServletRequest request, WatcherPacketDef packet) throws Exception {
         String name_fields = request.getParameter("name_fields");
         Set<String> nameSet = new HashSet<>();
         if (!passMatcher.validate(name_fields)) throw new Exception("name contains invalid character.");

@@ -20,8 +20,8 @@ public class DeviceTest extends ManageTest {
     }
 
     @Test
-    public void test() {
-        User user = new User("user", "123", "123");
+    public void test() throws Exception {
+        User user = new User("user11", "123", "123");
         this.userService.register(user);
         Device device = new Device("test");
         userService.registerDevice(user, device);

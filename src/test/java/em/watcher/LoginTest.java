@@ -20,18 +20,29 @@ public class LoginTest extends ManageTest {
     }
 
     @Before
-    public void before() {
-        User user = new User("user", "123", "123");
+    public void before() throws Exception {
+        User user = new User("user12", "123", "123");
         this.userService.register(user);
     }
 
     @Test
-    public void test() {
-        User user = new User("user", "123", "123");
+    public void test() throws Exception {
+        User user = new User("user12", "123", "123");
         assertThat(this.userService.login(user) != null, is(true));
+
+    }
+
+    @Test(expected = Exception.class)
+    public void testPassword() throws Exception {
+        User user = new User("user12", "123", "123");
         user.setPassword("124");
-        assertThat(this.userService.login(user) != null, is(false));
-        user = new User("user1", "123", "123");
-        assertThat(this.userService.login(user) != null, is(false));
+        this.userService.login(user);
+
+    }
+
+    @Test(expected = Exception.class)
+    public void testAccount() throws Exception {
+        User user = new User("user1", "123", "123");
+        this.userService.login(user);
     }
 }

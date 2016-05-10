@@ -1,10 +1,9 @@
 package em.watcher.user;
 
-import em.watcher.control.Control;
+import em.watcher.control.ControlDef;
 import em.watcher.device.Device;
-import em.watcher.report.Report;
+import em.watcher.report.ReportDef;
 
-import javax.jws.soap.SOAPBinding;
 import javax.persistence.*;
 import java.util.*;
 
@@ -19,15 +18,15 @@ public class User {
     private List<Device> devices;
 
     @OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
-    private List<Control> controls;
+    private List<ControlDef> controlDefs;
 
     @OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
-    private List<Report> reports;
+    private List<ReportDef> reportDefs;
 
     public User() {
         this.devices = new LinkedList<>();
-        this.controls = new LinkedList<>();
-        this.reports = new LinkedList<>();
+        this.controlDefs = new LinkedList<>();
+        this.reportDefs = new LinkedList<>();
     }
 
     public User(String account, String password, String fullName) {
@@ -62,28 +61,31 @@ public class User {
     }
 
     public void addDevice(Device device) {
+        device.setUser(this);
         this.devices.add(device);
     }
 
-    public void addControl(Control control) {
-        this.controls.add(control);
+    public void addControl(ControlDef controlDef) {
+        controlDef.setUser(this);
+        this.controlDefs.add(controlDef);
     }
 
-    public void addReport(Report report) {
-        this.reports.add(report);
+    public void addReport(ReportDef reportDef) {
+        reportDef.setUser(this);
+        this.reportDefs.add(reportDef);
     }
 
     public List<Device> getDevices() {
         return devices;
     }
 
-    public List<Control> getControls() {
-        return controls;
+    public List<ControlDef> getControlDefs() {
+        return controlDefs;
     }
 
-    public List<Report> getReports() {
+    public List<ReportDef> getReportDefs() {
 
-        return reports;
+        return reportDefs;
     }
 
     public String toString() {

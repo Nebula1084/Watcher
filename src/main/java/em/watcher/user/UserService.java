@@ -1,8 +1,9 @@
 package em.watcher.user;
 
-import em.watcher.control.Control;
+import em.watcher.control.ControlDef;
 import em.watcher.device.Device;
-import em.watcher.report.Report;
+import em.watcher.report.ReportDef;
+import org.apache.commons.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 
-@Service("userService")
+@Service
 public class UserService {
     @Autowired
     UserRepository userRepository;
@@ -19,29 +20,31 @@ public class UserService {
     }
 
     @Transactional
-    public User register(String account, String password, String nickName) {
+    public User register(String account, String password, String nickName) throws Exception {
         User user = new User(account, password, nickName);
         return this.register(user);
     }
 
     @Transactional
-    public User register(User user) {
+    public User register(User user) throws Exception {
         List<User> users = this.userRepository.findByAccount(user.getAccount());
-        if (users.isEmpty()) {
-            this.userRepository.save(user);
-            return user;
-        } else {
-            return null;
+        if (!users.isEmpty()){
+            System.out.println(users);
+            throw new Exception("Account " + user.getAccount() + " already exists.");
         }
+
+        this.userRepository.save(user);
+        return user;
     }
 
     @Transactional
-    public User login(User user) {
+    public User login(User user) throws Exception {
         List<User> users = this.userRepository.findByAccount(user.getAccount());
-        if (!users.isEmpty() && Objects.equals(user.getPassword(), users.get(0).getPassword()))
-            return users.get(0);
-        else
-            return null;
+        if (users.isEmpty())
+            throw new Exception("Account " + user.getAccount() + " doesn't exists.");
+        if (!Objects.equals(user.getPassword(), users.get(0).getPassword()))
+            throw new Exception("Password isn't correct");
+        return users.get(0);
     }
 
     @Transactional
@@ -58,18 +61,18 @@ public class UserService {
     }
 
     @Transactional
-    public User registerControl(User user, Control control) throws Exception {
-        if (user.getControls().contains(control))
-            throw new Exception("Control name duplicate.");
-        user.addControl(control);
+    public User registerControl(User user, ControlDef controlDef) throws Exception {
+        if (user.getControlDefs().contains(controlDef))
+            throw new Exception("ControlDef name duplicate.");
+        user.addControl(controlDef);
         return userRepository.save(user);
     }
 
     @Transactional
-    public User registerReport(User user, Report report) throws Exception {
-        if (user.getReports().contains(report))
-            throw new Exception("Report name duplicate");
-        user.addReport(report);
+    public User registerReport(User user, ReportDef reportDef) throws Exception {
+        if (user.getReportDefs().contains(reportDef))
+            throw new Exception("ReportDef name duplicate");
+        user.addReport(reportDef);
         return userRepository.save(user);
     }
 }

@@ -54,19 +54,19 @@ public class MouseSession extends Thread {
         }
     }
 
-    protected void ack() throws IOException {
+    private void ack() throws IOException {
         out.print((char)MessageType.ACK.ordinal());
         out.flush();
     }
-    protected void nack() throws IOException {
+    private void nack() throws IOException {
         out.print((char)MessageType.NACK.ordinal());
         out.flush();
     }
-    protected void respond(boolean val) throws IOException {
+    private void respond(boolean val) throws IOException {
         if (val) ack();
         else nack();
     }
-    protected boolean login() throws IOException{
+    private boolean login() throws IOException{
         int c, device_id = 0;
         boolean ret = true;
         char[] key = new char[32];
@@ -156,7 +156,7 @@ public class MouseSession extends Thread {
 
     }
 
-    protected boolean logout() throws IOException{
+    private boolean logout() throws IOException{
         int c;
 
         System.out.println("Recv LOGOUT.");

@@ -41,14 +41,16 @@ public class UserController implements Sessionable {
             status.status = 2;
             return "redirect:/login.html";
         } else {
-            User temp = this.userService.login(user);
-            if (temp != null) {
+            User temp = null;
+            try {
+                temp = this.userService.login(user);
                 this.logger.info(temp + " login sucessed");
                 status.status = 0;
                 model.addAttribute(Sessionable.User, temp);
                 return "redirect:/index.html";
-            } else {
-                this.logger.info(user + " login failed");
+            } catch (Exception e) {
+                e.printStackTrace();
+                this.logger.info(e);
                 status.status = 1;
                 return "redirect:/login.html";
             }
@@ -63,14 +65,16 @@ public class UserController implements Sessionable {
             status.status = 2;
             return "redirect:/register.html";
         } else {
-            User temp = this.userService.register(user);
-            if (temp != null) {
+            User temp = null;
+            try {
+                temp = this.userService.register(user);
                 this.logger.info(temp + " register successes");
                 status.status = 0;
                 model.addAttribute(Sessionable.User, temp);
                 return "redirect:/index.html";
-            } else {
-                this.logger.info(user + " register failed");
+            } catch (Exception e) {
+                e.printStackTrace();
+                this.logger.info(e);
                 status.status = WatcherStatus.account_aldeady_exist;
                 return "redirect:/register.html";
             }

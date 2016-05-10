@@ -60,14 +60,22 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                         <a href="/index.html"><i class="fa fa-dashboard fa-fw nav_icon"></i>Home</a>
                     </li>
                     <li>
-                        <a href="/register_device.html"><i class="fa fa-check-square-o nav_icon"></i>Register device</a>
+                        <a href="/register_device.html">
+                            <i class="fa fa-check-square-o nav_icon"></i>
+                            Register device
+                        </a>
                     </li>
                     <li>
-                        <a href="/register_report.html"><i class="fa fa-check-square-o nav_icon"></i>Register report</a>
+                        <a href="/register_report.html">
+                            <i class="fa fa-check-square-o nav_icon"></i>
+                            Register report
+                        </a>
                     </li>
                     <li>
-                        <a href="/register_control.html"><i class="fa fa-check-square-o nav_icon"></i>Register
-                            control</a>
+                        <a href="/register_control.html">
+                            <i class="fa fa-check-square-o nav_icon"></i>
+                            Register control
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -103,10 +111,11 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                         </tr>
                         </thead>
                         <tr th:class="${rowStat.odd} ? 'active' : 'success'"
-                            th:each="control,rowStat : ${curUser.getControls()}">
-                            <th scope="row" th:text="${control.getId()}"></th>
-                            <td th:text="${control.getName()}"></td>
-                            <td th:text="${control.getType(fields)}" th:each="fields : ${control.getField()}"></td>
+                            th:each="controlDef,rowStat : ${curUser.getControlDefs()}">
+                            <th scope="row" th:text="${controlDef.getId()}"></th>
+                            <td th:text="${controlDef.getName()}"></td>
+                            <td th:text="${controlDef.getType(fields)}"
+                                th:each="fields : ${controlDef.getField()}"></td>
                         </tr>
                     </table>
                 </div>
@@ -120,10 +129,10 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                         </tr>
                         </thead>
                         <tr th:class="${rowStat.odd} ? 'active' : 'success'"
-                            th:each="report,rowStat : ${curUser.getReports()}">
-                            <th scope="row" th:text="${report.getId()}"></th>
-                            <td th:text="${report.getName()}"></td>
-                            <td th:text="${report.getType(fields)}" th:each="fields : ${report.getField()}"></td>
+                            th:each="reportDef,rowStat : ${curUser.getReportDefs()}">
+                            <th scope="row" th:text="${reportDef.getId()}"></th>
+                            <td th:text="${reportDef.getName()}"></td>
+                            <td th:text="${reportDef.getType(fields)}" th:each="fields : ${reportDef.getField()}"></td>
                         </tr>
                     </table>
                 </div>

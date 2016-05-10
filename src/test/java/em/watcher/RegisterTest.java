@@ -20,17 +20,15 @@ public class RegisterTest extends ManageTest {
     }
 
     @Before
-    public void before() {
-        User user = new User("user", "123", "123");
+    public void before() throws Exception {
+        User user = new User("user13", "123", "123");
         this.userService.register(user);
     }
 
     @Test
-    public void test() {
-        User user = new User("user1", "123", "123");
+    public void test() throws Exception {
+        User user = new User("user14", "123", "123");
         assertThat(this.userService.register(user) != null, is(true));
-        user = new User("user1", "123", "123");
-        assertThat(this.userService.register(user) != null, is(false));
     }
 
 }
