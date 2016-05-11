@@ -2,9 +2,11 @@ package em.watcher.report;
 
 import em.watcher.PacketValidator;
 import em.watcher.device.DeviceService;
+import em.watcher.user.UserCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +17,7 @@ public class ReportService {
     @Autowired
     private DeviceService deviceService;
 
-    @Autowired
+    @Resource(name = ReportDefCache.NAME)
     private ReportDefRepository reportDefRepository;
 
     @Autowired

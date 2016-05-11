@@ -3,9 +3,11 @@ package em.watcher.control;
 import em.watcher.PacketValidator;
 import em.watcher.device.Device;
 import em.watcher.device.DeviceService;
+import em.watcher.user.UserCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -16,13 +18,13 @@ import static em.watcher.conroller.PacketController.*;
 public class ControlService {
     @Autowired
     private DeviceService deviceService;
-    @Autowired
+    @Resource(name = ControlDefCache.NAME)
     private ControlDefRepository controlDefRepository;
     @Autowired
     private PacketValidator packetValidator;
     @Autowired
     private ControlPacketPool packetPool;
-    @Autowired
+    @Resource(name = ControlPacketCache.NAME)
     private ControlPacketRepository packetRepository;
 
 
@@ -100,7 +102,6 @@ public class ControlService {
     }
 
     public ControlPacket recordControl(ControlDef controlDef, ControlPacket controlPacket) {
-//        controlPacket = packetRepository.save(controlPacket);
         controlDef.addControl(controlPacket);
         controlDef = controlDefRepository.save(controlDef);
         return controlDef.getLast();

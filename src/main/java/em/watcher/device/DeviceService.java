@@ -1,13 +1,13 @@
 package em.watcher.device;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 @Service
 public class DeviceService {
-    @Autowired
+    @Resource(name = DeviceCache.NAME)
     DeviceRepository deviceRepository;
 
     public boolean authenticate(Long id, String key) throws Exception {

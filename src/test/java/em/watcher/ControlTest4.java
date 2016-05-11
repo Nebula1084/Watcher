@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import em.watcher.control.ControlDef;
 import em.watcher.control.ControlPacket;
 import org.junit.Test;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.util.MultiValueMap;
 
 import java.util.Collections;

@@ -1,6 +1,5 @@
 package em.watcher.report;
 
-import em.watcher.user.User;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
