@@ -66,7 +66,7 @@ public class ControlService {
         }
     }
 
-    private ControlPacket sendControl(Device device, ControlPacket packet) {
+    public ControlPacket sendControl(Device device, ControlPacket packet) {
         synchronized (packet) {
             packetPool.offer(device, packet);
             try {
@@ -84,7 +84,7 @@ public class ControlService {
         return null;
     }
 
-    private ControlPacket recvControl(Device device, ControlPacket packet) {
+    public ControlPacket recvControl(Device device, ControlPacket packet) {
         ControlPacket recvPacket = packetPool.poll(device);
         if (recvPacket == null)
             return null;

@@ -1,22 +1,51 @@
 package em.watcher.mouse;
 
+import em.watcher.WatcherPacketDef;
+import em.watcher.control.ControlDef;
+import em.watcher.control.ControlPacket;
+import em.watcher.control.ControlService;
+import em.watcher.device.Device;
+import em.watcher.device.DeviceService;
+import em.watcher.report.ReportDef;
+import em.watcher.report.ReportService;
+import em.watcher.report.ReportlPacket;
+
+import javax.persistence.Entity;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Map;
+
+class ReadFieldException extends Exception {
+    ReadFieldException(String msg) {
+        super(msg);
+    }
+}
 
 public class MouseSession extends Thread {
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out;
 
+    private DeviceService deviceService;
+    private ReportService reportService;
+    private ControlService controlService;
+
+    private int auth_id;
+
     private enum MessageType {
         ACK, NACK, LOGIN, REPORT, CONTROL, LOGOUT
     }
 
-    public MouseSession(Socket socket) {
+    public MouseSession(Socket socket, DeviceService deviceService, ReportService reportService, ControlService controlService) {
         this.socket = socket;
+        this.deviceService = deviceService;
+        this.reportService = reportService;
+        this.controlService = controlService;
     }
 
     @Override
@@ -27,30 +56,117 @@ public class MouseSession extends Thread {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "ISO-8859-1"));
             out = new PrintWriter(socket.getOutputStream(), true);
 
-            // if
-            login();
-            // else
-            // socket.close();
-
-            while ((c = in.read()) != -1) {
-                System.out.println("Head: " + MessageType.values()[c]);
-                if (c == MessageType.REPORT.ordinal())
-                    report();
-                else if (c == MessageType.CONTROL.ordinal())
-                    control();
-                else if (c == MessageType.LOGOUT.ordinal())
-                    if (logout()) break;
+            if (login()) {
+                System.out.println("Login successfully.");
+                while ((c = in.read()) != -1) {
+                    System.out.println("Head: " + MessageType.values()[c]);
+                    if (c == MessageType.REPORT.ordinal())
+                        report();
+                    else if (c == MessageType.CONTROL.ordinal())
+                        control();
+                    else if (c == MessageType.LOGOUT.ordinal())
+                        if (logout()) break;
+                }
+                if (c == -1)
+                    throw new ReadFieldException("Read Head Error");
             }
 
-            System.out.println("connection finished");
+            System.out.println("connection finished.");
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
+        } catch (ReadFieldException e) {
+            System.out.println(e.getMessage());
+        }
+        finally {
             try {
                 socket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private int readInt() throws IOException, ReadFieldException {
+        int ret = 0, c;
+        for (int i = 0; i < 4; i++) {
+            if ((c = in.read()) != -1) {
+                ret += c << (8 * i);
+            }
+            else throw new ReadFieldException("Read Int Error");
+        }
+        return ret;
+    }
+    private float readFloat() throws IOException, ReadFieldException {
+        int data = 0, c;
+        for (int i = 0; i < 4; i++) {
+            if ((c = in.read()) != -1) {
+                data += c << (8 * i);
+            }
+            else throw new ReadFieldException("Read Float Error");
+        }
+        return Float.intBitsToFloat(data);
+    }
+    private double readDouble() throws IOException, ReadFieldException {
+        int c;
+        long data_double = 0;
+        for (int i = 0; i < 8; i++) {
+            if ((c = in.read()) != -1) {
+                data_double += ((long)c)<<(8*i);
+            }
+            else throw new ReadFieldException("Read Double Error");
+        }
+        return Double.longBitsToDouble(data_double);
+    }
+    private char[] readKey() throws IOException, ReadFieldException {
+        int c;
+        char[] key= new char[32];
+        for (int i = 0; i < 32; i++) {
+            if ((c = in.read()) != -1) {
+                key[i] = (char)c;
+            }
+            else throw new ReadFieldException("Read Key Error");
+        }
+        return key;
+    }
+    private String readString(int length) throws IOException, ReadFieldException {
+        int c;
+        char[] key= new char[length];
+        for (int i = 0; i < length; i++) {
+            if ((c = in.read()) != -1) {
+                key[i] = (char)c;
+            }
+            else throw new ReadFieldException("Read Key Error");
+        }
+        return String.valueOf(key);
+    }
+
+    private static String byte2hex(byte [] buffer){
+        String h = "";
+
+        for(int i = 0; i < buffer.length; i++){
+            String temp = Integer.toHexString(buffer[i] & 0xFF);
+            if(temp.length() == 1){
+                temp = "0" + temp;
+            }
+            h = h + temp;
+        }
+        return h;
+
+    }
+    private static boolean validateKey(String id, String reportName, char[] key) {
+        String tmp = "";
+
+        try {
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            md5.update(id.getBytes());
+            tmp = byte2hex(md5.digest()) + reportName;
+            md5.update(tmp.getBytes());
+            tmp = byte2hex(md5.digest());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        finally {
+            return String.valueOf(key).equals(tmp);
         }
     }
 
@@ -66,103 +182,166 @@ public class MouseSession extends Thread {
         if (val) ack();
         else nack();
     }
-    private boolean login() throws IOException{
-        int c, device_id = 0;
+
+    private boolean login() throws IOException {
+        int c;
         boolean ret = true;
-        char[] key = new char[32];
 
-        if ((c = in.read()) != -1) {
-            System.out.println("Head: " + MessageType.values()[c]);
-            if (c == MessageType.LOGIN.ordinal()) {
-                for (int i = 0; i < 4; i++) {
-                    if ((c = in.read()) != -1) {
-                        device_id += c<<(8*i);
-                    }
-                    else {
-                        ret = false;
-                        break;
-                    }
+        try {
+            if ((c = in.read()) != -1) {
+                System.out.println("Head: " + MessageType.values()[c]);
+                if (c == MessageType.LOGIN.ordinal()) {
+                    auth_id = readInt();
+                    System.out.println("Device ID: " + auth_id);
+
+                    char[] key = readKey();
+                    System.out.print("Key: ");
+                    System.out.println(key);
+
+                    String reportName = deviceService.findDevice((long) auth_id).getName();
+                    ret = validateKey(String.valueOf(auth_id), reportName, key);
                 }
-                System.out.println("Device ID: " + device_id);
-
-                for (int i = 0; i < 32; i++) {
-                    if ((c = in.read()) != -1) {
-                        key[i] = (char)c;
-                    }
-                    else {
-                        ret = false;
-                        break;
-                    }
-                }
-                System.out.print("Key: ");
-                System.out.println(key);
-
-                //if (table[device_id] != key)
-                //ret = false;
             }
+            else throw new ReadFieldException("Read Head Error");
         }
-        respond(ret);
-
-        return ret;
+        catch (ReadFieldException e) {
+            ret = false;
+            System.out.println(e.getMessage());
+        }
+        catch (Exception e) {
+            ret = false;
+            if (e instanceof IOException)
+                throw e;
+            else
+                System.out.println(e.getMessage());
+        }
+        finally {
+            respond(ret);
+            return ret;
+        }
     }
 
     protected boolean report() throws IOException {
-        int c, id = 0, data_float = 0;
-        long data_double = 0;
+        int device_id, report_id;
         boolean ret = true;
 
-        System.out.println("Recv REPORT.");
+        try {
+            device_id = readInt();
+            report_id = readInt();
 
-        for (int i = 0; i < 4; i++) {
-            if ((c = in.read()) != -1) {
-                id += c<<(8*i);
+            ReportDef def = reportService.getReportDef((long) report_id);
+
+            System.out.println("Name: "+def.getName());
+            ReportlPacket packet = new ReportlPacket();
+            packet.setAuthId((long) auth_id);
+            packet.setDeviceId((long) device_id);
+            packet.setPacketDef(def);
+
+            for (String s: def.getField()) {
+                System.out.println(s);
+                switch (def.getType(s)) {
+                    case ReportDef.TYPE_INT:
+                        int data_int = readInt();
+                        packet.putField(s, data_int);
+                        System.out.println("Type Int: " + data_int);
+                        break;
+                    case ReportDef.TYPE_FLOAT:
+                        float data_float = readFloat();
+                        packet.putField(s, data_float);
+                        System.out.println("Type Float: " + data_float);
+                        break;
+                    case ReportDef.TYPE_STRING:
+                        int length = def.getLength(s);
+                        String data_str = readString(length);
+                        packet.putField(s, data_str);
+                        System.out.println("Type String: " + data_str);
+                        break;
+                    default:
+                }
             }
-            else {
-                ret = false;
-                break;
-            }
+            reportService.report(def, packet);
         }
-        System.out.println("Source ID: " + id);
-
-        //Test, float + double
-        for (int i = 0; i < 4; i++) {
-            if ((c = in.read()) != -1) {
-                data_float += c<<(8*i);
-            }
-            else {
-                ret = false;
-                break;
-            }
+        catch (ReadFieldException e) {
+            ret = false;
+            System.out.println(e.getMessage());
         }
-        System.out.println("Data1: float: " + Float.intBitsToFloat(data_float));
-
-        for (int i = 0; i < 8; i++) {
-            if ((c = in.read()) != -1) {
-                data_double += ((long)c)<<(8*i);
-            }
-            else {
-                ret = false;
-                break;
-            }
+        catch (Exception e) {
+            ret = false;
+            if (e instanceof IOException)
+                throw e;
+            else
+                System.out.println(e.getMessage());
         }
-        System.out.println("Data2: double: " + Double.longBitsToDouble(data_double));
-
-        respond(ret);
-
-        return ret;
+        finally {
+            respond(ret);
+            return ret;
+        }
     }
 
-    protected void control() {
+    protected boolean control() throws IOException {
+        boolean ret = true;
 
+        try {
+            String tag = readString(1);
+            int device_id = readInt();
+            int control_id = readInt();
+
+            ControlDef controlDef = controlService.getControlDef((long) control_id);
+            ControlPacket packet = new ControlPacket();
+            packet.setAuthId((long) auth_id);
+            packet.setDeviceId((long) device_id);
+            packet.setSR(tag);
+
+            switch (tag) {
+                case ControlPacket.Send:
+                    int target_id = readInt();
+                    Device target = deviceService.findDevice((long) target_id);
+                    for (String s: controlDef.getField()) {
+                        switch (controlDef.getType(s)) {
+                            case ControlDef.TYPE_INT:
+                                packet.putField(s, readInt());
+                                break;
+                            case ControlDef.TYPE_FLOAT:
+                                packet.putField(s, readFloat());
+                                break;
+                            case ControlDef.TYPE_STRING:
+                                int length = controlDef.getLength(s);
+                                packet.putField(s, readString(length));
+                                break;
+                            default:
+                        }
+                    }
+                    packet = controlService.recordControl(controlDef, packet);
+                    packet.setTargetId((long) target_id);
+                    controlService.sendControl(target, packet);
+                    break;
+
+                case ControlPacket.Recv:
+                    Device device = deviceService.findDevice((long) device_id);
+                    packet = controlService.recordControl(controlDef, packet);
+                    controlService.recvControl(device, packet);
+                    break;
+            }
+        }
+        catch (ReadFieldException e) {
+            ret = false;
+            System.out.println(e.getMessage());
+        }
+        catch (Exception e) {
+            ret = false;
+            if (e instanceof IOException)
+                throw e;
+            else
+                System.out.println(e.getMessage());
+        }
+        finally {
+            respond(ret);
+            return ret;
+        }
     }
 
     private boolean logout() throws IOException{
-        int c;
-
-        System.out.println("Recv LOGOUT.");
-
         ack();
-        socket.close();
         return true;
     }
 }
