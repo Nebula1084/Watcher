@@ -3,6 +3,8 @@ package em.watcher.device;
 import em.watcher.user.User;
 
 import javax.persistence.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 
 @Entity
@@ -35,8 +37,34 @@ public class Device {
         this.user = user;
     }
 
+    private static String byte2hex(byte [] buffer){
+        String h = "";
+
+        for(int i = 0; i < buffer.length; i++){
+            String temp = Integer.toHexString(buffer[i] & 0xFF);
+            if(temp.length() == 1){
+                temp = "0" + temp;
+            }
+            h = h + temp;
+        }
+        return h;
+
+    }
+
     public boolean authenticate(String key) {
-        return true;
+        String tmp = "";
+
+        try {
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            md5.update(id.toString().getBytes());
+            tmp = byte2hex(md5.digest()) + name;
+            md5.update(tmp.getBytes());
+            tmp = byte2hex(md5.digest());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        return key.equals(tmp);
     }
 
     @Override

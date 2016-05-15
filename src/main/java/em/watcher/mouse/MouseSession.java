@@ -140,36 +140,6 @@ public class MouseSession extends Thread {
         return String.valueOf(key);
     }
 
-    private static String byte2hex(byte [] buffer){
-        String h = "";
-
-        for(int i = 0; i < buffer.length; i++){
-            String temp = Integer.toHexString(buffer[i] & 0xFF);
-            if(temp.length() == 1){
-                temp = "0" + temp;
-            }
-            h = h + temp;
-        }
-        return h;
-
-    }
-    private static boolean validateKey(String id, String reportName, char[] key) {
-        String tmp = "";
-
-        try {
-            MessageDigest md5 = MessageDigest.getInstance("MD5");
-            md5.update(id.getBytes());
-            tmp = byte2hex(md5.digest()) + reportName;
-            md5.update(tmp.getBytes());
-            tmp = byte2hex(md5.digest());
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        finally {
-            return String.valueOf(key).equals(tmp);
-        }
-    }
-
     private void ack() throws IOException {
         out.print((char)MessageType.ACK.ordinal());
         out.flush();
@@ -198,8 +168,8 @@ public class MouseSession extends Thread {
                     System.out.print("Key: ");
                     System.out.println(key);
 
-                    String reportName = deviceService.findDevice((long) auth_id).getName();
-                    ret = validateKey(String.valueOf(auth_id), reportName, key);
+                    Device dev = deviceService.findDevice((long) auth_id);
+                    ret = dev.authenticate(String.valueOf(key));
                 }
             }
             else throw new ReadFieldException("Read Head Error");
