@@ -10,13 +10,12 @@ public abstract class WatcherPacketDef {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    private String userAccount;
     private String name;
     @ElementCollection(fetch = FetchType.EAGER)
     private Map<String, String> types;
     @ElementCollection(fetch = FetchType.EAGER)
     private Map<String, Integer> lengths;
-    @ManyToOne(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
-    private User user;
 
     public final static String TYPE_INT = "int";
     public final static String TYPE_FLOAT = "float";
@@ -38,13 +37,18 @@ public abstract class WatcherPacketDef {
         return id;
     }
 
+    public void setUserAccount(String userAccount) {
+        this.userAccount = userAccount;
+    }
+
+    public String getUserAccount() {
+        return userAccount;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
 
     public String getName() {
         return name;

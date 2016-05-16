@@ -1,5 +1,7 @@
 package em.watcher.device;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -7,7 +9,7 @@ import java.util.List;
 
 @Service
 public class DeviceService {
-    @Resource(name = DeviceCache.NAME)
+    @Autowired
     DeviceRepository deviceRepository;
 
     public boolean authenticate(Long id, String key) throws Exception {
@@ -23,6 +25,7 @@ public class DeviceService {
         return !devices.isEmpty();
     }
 
+    @Cacheable(Device.CACHE)
     public Device findDevice(Long id) throws Exception {
         List<Device> devices = deviceRepository.findById(id);
         if (devices.isEmpty())

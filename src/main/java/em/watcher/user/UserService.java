@@ -15,7 +15,7 @@ import java.util.Objects;
 
 @Service
 public class UserService {
-    @Resource(name = UserCache.NAME)
+    @Autowired
     UserRepository userRepository;
 
     public UserService() {

@@ -61,17 +61,17 @@ public class User {
     }
 
     public void addDevice(Device device) {
-        device.setUser(this);
+        device.setUserAccount(this.getAccount());
         this.devices.add(device);
     }
 
     public void addControl(ControlDef controlDef) {
-        controlDef.setUser(this);
+        controlDef.setUserAccount(this.getAccount());
         this.controlDefs.add(controlDef);
     }
 
     public void addReport(ReportDef reportDef) {
-        reportDef.setUser(this);
+        reportDef.setUserAccount(this.getAccount());
         this.reportDefs.add(reportDef);
     }
 

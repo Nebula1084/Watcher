@@ -10,24 +10,14 @@ import java.util.List;
 @Entity
 public class ControlDef extends WatcherPacketDef {
 
-    @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
-    private List<ControlPacket> packets;
+    final static public String CACHE = "ControlDefs";
 
     public ControlDef() {
         super();
-        packets = new LinkedList<>();
     }
 
     public ControlDef(String name) {
         super(name);
-        packets = new LinkedList<>();
     }
 
-    public void addControl(ControlPacket packet) {
-        packets.add(packet);
-    }
-
-    public ControlPacket getLast() {
-        return packets.get(packets.size() - 1);
-    }
 }

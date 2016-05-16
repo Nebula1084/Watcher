@@ -2,11 +2,10 @@ package em.watcher.report;
 
 import em.watcher.PacketValidator;
 import em.watcher.device.DeviceService;
-import em.watcher.user.UserCache;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
@@ -17,11 +16,14 @@ public class ReportService {
     @Autowired
     private DeviceService deviceService;
 
-    @Resource(name = ReportDefCache.NAME)
+    @Autowired
     private ReportDefRepository reportDefRepository;
 
     @Autowired
     private PacketValidator packetValidator;
+
+    @Autowired
+    private ReportPacketRepository packetRepository;
 
     public void report(Map<String, String> params) throws Exception {
         Long authId = Long.valueOf(params.get(AUTH_ID));
@@ -39,22 +41,19 @@ public class ReportService {
         ReportlPacket packet = new ReportlPacket();
         packet.setAuthId(authId);
         packet.setDeviceId(deviceId);
-        packet.setPacketDef(reportDef);
+        packet.setDefId(reportDef.getId());
         for (String field : reportDef.getField()) {
             packet.putField(field, params.get(field));
         }
-        this.report(reportDef, packet);
+        this.report(packet);
     }
 
-    public void report(Long reportId, ReportlPacket reportlPacket) throws Exception {
-        report(getReportDef(reportId), reportlPacket);
+
+    public void report(ReportlPacket reportlPacket) {
+        packetRepository.save(reportlPacket);
     }
 
-    public void report(ReportDef reportDef, ReportlPacket reportlPacket) {
-        reportDef.addReport(reportlPacket);
-        reportDefRepository.save(reportDef);
-    }
-
+    @Cacheable(ReportDef.CACHE)
     public ReportDef getReportDef(Long id) throws Exception {
         List<ReportDef> reportDefs = reportDefRepository.findById(id);
         if (reportDefs.isEmpty())

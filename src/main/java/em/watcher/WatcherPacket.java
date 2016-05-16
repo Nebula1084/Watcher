@@ -10,6 +10,7 @@ abstract public class WatcherPacket {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    private Long defId;
     private Long authId;
     private Long deviceId;
     private Date time;
@@ -24,6 +25,14 @@ abstract public class WatcherPacket {
 
     public Long getId() {
         return id;
+    }
+
+    public void setDefId(Long defId) {
+        this.defId = defId;
+    }
+
+    public Long getDefId() {
+        return defId;
     }
 
     public void setAuthId(Long authId) {

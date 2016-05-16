@@ -79,12 +79,12 @@ public class ControlTest4 extends PacketTest {
 
         MultiValueMap<String, String> recvForm = this.getMvm(this.target.getId(), controlDef);
         recvForm.add(SR, ControlPacket.Recv);
-        TestThread[] threads = new TestThread[10];
-        for (int i = 0; i < 5; i++) {
+        TestThread[] threads = new TestThread[50];
+        for (int i = 0; i < 50; i++) {
             threads[i] = new TestThread(sendForm, recvForm);
             threads[i].start();
         }
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 50; i++) {
             threads[i].join();
         }
         for (Long key : packetMap.keySet()) {
@@ -92,6 +92,6 @@ public class ControlTest4 extends PacketTest {
             ControlPacket fellow = packetMap.get(packet.getFellowPacketId());
             assertThat(fellow.getFellowPacketId(), is(packet.getId()));
         }
-        assertThat(packetMap.size(), is(10));
+        assertThat(packetMap.size(), is(100));
     }
 }

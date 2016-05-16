@@ -3,11 +3,10 @@ package em.watcher.control;
 import em.watcher.PacketValidator;
 import em.watcher.device.Device;
 import em.watcher.device.DeviceService;
-import em.watcher.user.UserCache;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -18,13 +17,13 @@ import static em.watcher.conroller.PacketController.*;
 public class ControlService {
     @Autowired
     private DeviceService deviceService;
-    @Resource(name = ControlDefCache.NAME)
+    @Autowired
     private ControlDefRepository controlDefRepository;
     @Autowired
     private PacketValidator packetValidator;
     @Autowired
     private ControlPacketPool packetPool;
-    @Resource(name = ControlPacketCache.NAME)
+    @Autowired
     private ControlPacketRepository packetRepository;
 
 
@@ -52,7 +51,8 @@ public class ControlService {
             for (String field : controlDef.getField()) {
                 packet.putField(field, params.get(field));
             }
-        packet = this.recordControl(controlDef, packet);
+        packet.setDefId(controlDef.getId());
+        packet = this.recordControl(packet);
         switch (packet.getSR()) {
             case ControlPacket.Send:
                 Long targetId = Long.valueOf(params.get(TARGET_ID));
@@ -97,16 +97,12 @@ public class ControlService {
         return recvPacket;
     }
 
-    public void recordControl(Long id, ControlPacket controlPacket) throws Exception {
-        recordControl(getControlDef(id), controlPacket);
+
+    public ControlPacket recordControl(ControlPacket controlPacket) {
+        return packetRepository.save(controlPacket);
     }
 
-    public ControlPacket recordControl(ControlDef controlDef, ControlPacket controlPacket) {
-        controlDef.addControl(controlPacket);
-        controlDef = controlDefRepository.save(controlDef);
-        return controlDef.getLast();
-    }
-
+    @Cacheable(ControlDef.CACHE)
     public ControlDef getControlDef(Long id) throws Exception {
         List<ControlDef> controlDefs = controlDefRepository.findById(id);
         if (controlDefs.isEmpty())

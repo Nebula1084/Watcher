@@ -8,12 +8,13 @@ import java.util.Objects;
 @Entity
 public class Device {
 
+    final static public String CACHE = "Devices";
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    private String userAccount;
     private String name;
-    @ManyToOne(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
-    private User user;
 
     public Device() {
 
@@ -31,8 +32,12 @@ public class Device {
         return name;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserAccount(String userAccount) {
+        this.userAccount = userAccount;
+    }
+
+    public String getUserAccount() {
+        return userAccount;
     }
 
     public boolean authenticate(String key) {
@@ -53,6 +58,6 @@ public class Device {
 
     @Override
     public String toString() {
-        return String.format("{id : %s, name : %s, user : %s}", id, name, user);
+        return String.format("{id : %s, name : %s, user : %s}", id, name, userAccount);
     }
 }

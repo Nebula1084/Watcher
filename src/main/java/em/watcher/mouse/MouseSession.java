@@ -76,8 +76,7 @@ public class MouseSession extends Thread {
             e.printStackTrace();
         } catch (ReadFieldException e) {
             System.out.println(e.getMessage());
-        }
-        finally {
+        } finally {
             try {
                 socket.close();
             } catch (IOException e) {
@@ -91,61 +90,60 @@ public class MouseSession extends Thread {
         for (int i = 0; i < 4; i++) {
             if ((c = in.read()) != -1) {
                 ret += c << (8 * i);
-            }
-            else throw new ReadFieldException("Read Int Error");
+            } else throw new ReadFieldException("Read Int Error");
         }
         return ret;
     }
+
     private float readFloat() throws IOException, ReadFieldException {
         int data = 0, c;
         for (int i = 0; i < 4; i++) {
             if ((c = in.read()) != -1) {
                 data += c << (8 * i);
-            }
-            else throw new ReadFieldException("Read Float Error");
+            } else throw new ReadFieldException("Read Float Error");
         }
         return Float.intBitsToFloat(data);
     }
+
     private double readDouble() throws IOException, ReadFieldException {
         int c;
         long data_double = 0;
         for (int i = 0; i < 8; i++) {
             if ((c = in.read()) != -1) {
-                data_double += ((long)c)<<(8*i);
-            }
-            else throw new ReadFieldException("Read Double Error");
+                data_double += ((long) c) << (8 * i);
+            } else throw new ReadFieldException("Read Double Error");
         }
         return Double.longBitsToDouble(data_double);
     }
+
     private char[] readKey() throws IOException, ReadFieldException {
         int c;
-        char[] key= new char[32];
+        char[] key = new char[32];
         for (int i = 0; i < 32; i++) {
             if ((c = in.read()) != -1) {
-                key[i] = (char)c;
-            }
-            else throw new ReadFieldException("Read Key Error");
+                key[i] = (char) c;
+            } else throw new ReadFieldException("Read Key Error");
         }
         return key;
     }
+
     private String readString(int length) throws IOException, ReadFieldException {
         int c;
-        char[] key= new char[length];
+        char[] key = new char[length];
         for (int i = 0; i < length; i++) {
             if ((c = in.read()) != -1) {
-                key[i] = (char)c;
-            }
-            else throw new ReadFieldException("Read Key Error");
+                key[i] = (char) c;
+            } else throw new ReadFieldException("Read Key Error");
         }
         return String.valueOf(key);
     }
 
-    private static String byte2hex(byte [] buffer){
+    private static String byte2hex(byte[] buffer) {
         String h = "";
 
-        for(int i = 0; i < buffer.length; i++){
+        for (int i = 0; i < buffer.length; i++) {
             String temp = Integer.toHexString(buffer[i] & 0xFF);
-            if(temp.length() == 1){
+            if (temp.length() == 1) {
                 temp = "0" + temp;
             }
             h = h + temp;
@@ -153,6 +151,7 @@ public class MouseSession extends Thread {
         return h;
 
     }
+
     private static boolean validateKey(String id, String reportName, char[] key) {
         String tmp = "";
 
@@ -164,20 +163,21 @@ public class MouseSession extends Thread {
             tmp = byte2hex(md5.digest());
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             return String.valueOf(key).equals(tmp);
         }
     }
 
     private void ack() throws IOException {
-        out.print((char)MessageType.ACK.ordinal());
+        out.print((char) MessageType.ACK.ordinal());
         out.flush();
     }
+
     private void nack() throws IOException {
-        out.print((char)MessageType.NACK.ordinal());
+        out.print((char) MessageType.NACK.ordinal());
         out.flush();
     }
+
     private void respond(boolean val) throws IOException {
         if (val) ack();
         else nack();
@@ -201,21 +201,17 @@ public class MouseSession extends Thread {
                     String reportName = deviceService.findDevice((long) auth_id).getName();
                     ret = validateKey(String.valueOf(auth_id), reportName, key);
                 }
-            }
-            else throw new ReadFieldException("Read Head Error");
-        }
-        catch (ReadFieldException e) {
+            } else throw new ReadFieldException("Read Head Error");
+        } catch (ReadFieldException e) {
             ret = false;
             System.out.println(e.getMessage());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             ret = false;
             if (e instanceof IOException)
                 throw e;
             else
                 System.out.println(e.getMessage());
-        }
-        finally {
+        } finally {
             respond(ret);
             return ret;
         }
@@ -231,13 +227,13 @@ public class MouseSession extends Thread {
 
             ReportDef def = reportService.getReportDef((long) report_id);
 
-            System.out.println("Name: "+def.getName());
+            System.out.println("Name: " + def.getName());
             ReportlPacket packet = new ReportlPacket();
             packet.setAuthId((long) auth_id);
             packet.setDeviceId((long) device_id);
-            packet.setPacketDef(def);
+            packet.setDefId(def.getId());
 
-            for (String s: def.getField()) {
+            for (String s : def.getField()) {
                 System.out.println(s);
                 switch (def.getType(s)) {
                     case ReportDef.TYPE_INT:
@@ -259,20 +255,17 @@ public class MouseSession extends Thread {
                     default:
                 }
             }
-            reportService.report(def, packet);
-        }
-        catch (ReadFieldException e) {
+            reportService.report(packet);
+        } catch (ReadFieldException e) {
             ret = false;
             System.out.println(e.getMessage());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             ret = false;
             if (e instanceof IOException)
                 throw e;
             else
                 System.out.println(e.getMessage());
-        }
-        finally {
+        } finally {
             respond(ret);
             return ret;
         }
@@ -296,7 +289,7 @@ public class MouseSession extends Thread {
                 case ControlPacket.Send:
                     int target_id = readInt();
                     Device target = deviceService.findDevice((long) target_id);
-                    for (String s: controlDef.getField()) {
+                    for (String s : controlDef.getField()) {
                         switch (controlDef.getType(s)) {
                             case ControlDef.TYPE_INT:
                                 packet.putField(s, readInt());
@@ -311,36 +304,35 @@ public class MouseSession extends Thread {
                             default:
                         }
                     }
-                    packet = controlService.recordControl(controlDef, packet);
+                    packet.setDefId(controlDef.getId());
+                    packet = controlService.recordControl(packet);
                     packet.setTargetId((long) target_id);
                     controlService.sendControl(target, packet);
                     break;
 
                 case ControlPacket.Recv:
                     Device device = deviceService.findDevice((long) device_id);
-                    packet = controlService.recordControl(controlDef, packet);
+                    packet.setDefId(controlDef.getId());
+                    packet = controlService.recordControl(packet);
                     controlService.recvControl(device, packet);
                     break;
             }
-        }
-        catch (ReadFieldException e) {
+        } catch (ReadFieldException e) {
             ret = false;
             System.out.println(e.getMessage());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             ret = false;
             if (e instanceof IOException)
                 throw e;
             else
                 System.out.println(e.getMessage());
-        }
-        finally {
+        } finally {
             respond(ret);
             return ret;
         }
     }
 
-    private boolean logout() throws IOException{
+    private boolean logout() throws IOException {
         ack();
         return true;
     }
