@@ -1,7 +1,5 @@
 package em.watcher;
 
-import em.watcher.user.User;
-
 import javax.persistence.*;
 import java.util.*;
 
@@ -13,6 +11,8 @@ public abstract class WatcherPacketDef {
     private String userAccount;
     private String name;
     @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> names;
+    @ElementCollection(fetch = FetchType.EAGER)
     private Map<String, String> types;
     @ElementCollection(fetch = FetchType.EAGER)
     private Map<String, Integer> lengths;
@@ -23,6 +23,7 @@ public abstract class WatcherPacketDef {
     public final static String TYPE_STRING = "string";
 
     public WatcherPacketDef() {
+        this.names = new LinkedList<>();
         this.types = new LinkedHashMap<>();
         this.lengths = new LinkedHashMap<>();
     }
@@ -31,7 +32,6 @@ public abstract class WatcherPacketDef {
         this();
         this.name = name;
     }
-
 
     public Long getId() {
         return id;
@@ -48,7 +48,6 @@ public abstract class WatcherPacketDef {
     public void setName(String name) {
         this.name = name;
     }
-
 
     public String getName() {
         return name;
@@ -74,12 +73,13 @@ public abstract class WatcherPacketDef {
         if (!isType(type, length)) throw new Exception("type is invalid.");
         if ((1 > length) || (length > 1000)) throw new Exception("length is invalid.");
         if (types.containsKey(name)) throw new Exception("this field already exists");
+        names.add(name);
         types.put(name, type);
         lengths.put(name, length);
     }
 
-    public Set<String> getField() {
-        return types.keySet();
+    public List<String> getField() {
+        return names;
     }
 
     public Boolean isType(String type, Integer length) {

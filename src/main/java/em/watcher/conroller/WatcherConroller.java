@@ -46,10 +46,10 @@ public class WatcherConroller implements Sessionable {
                 throw new Exception("Device name contains invalid character.");
             device = new Device(device_name);
             model.addAttribute(Sessionable.User, userService.registerDevice(user, device));
-            return "redirect:" + WatcherView.indexPage;
+            return "redirect:/" + WatcherView.indexPage;
         } catch (Exception e) {
             status.setException(e);
-            return "redirect:" + WatcherView.deviceRgstPage;
+            return "redirect:/" + WatcherView.deviceRgstPage;
         }
     }
 
@@ -60,10 +60,10 @@ public class WatcherConroller implements Sessionable {
         try {
             reportDef = getReport(httpRequest);
             model.addAttribute(Sessionable.User, userService.registerReport(user, reportDef));
-            return "redirect:" + WatcherView.indexPage;
+            return "redirect:/" + WatcherView.indexPage;
         } catch (Exception e) {
             status.setException(e);
-            return "redirect:" + WatcherView.reportRgstPage;
+            return "redirect:/" + WatcherView.reportRgstPage;
         }
     }
 

@@ -1,8 +1,9 @@
 package em.watcher.device;
 
-import em.watcher.user.User;
-
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
@@ -24,6 +25,10 @@ public class Device {
 
     public Device(String name) {
         this.name = name;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getId() {
@@ -57,6 +62,10 @@ public class Device {
     }
 
     public boolean authenticate(String key) {
+        return getKey().equals(key);
+    }
+
+    public String getKey() {
         String tmp = "";
 
         try {
@@ -68,8 +77,8 @@ public class Device {
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-
-        return key.equals(tmp);
+        
+        return tmp;
     }
 
     @Override

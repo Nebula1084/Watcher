@@ -20,44 +20,29 @@ public class ControlTest2 extends PacketTest {
     ObjectMapper objectMapper = new ObjectMapper();
 
 
-
     @Test
     public void testControl() throws Exception {
         ControlDef def = controlService.getControlDef(controlDef.getId());
         assertThat(def != null, is(true));
         System.out.println("------------------------------" + (def != null ? def.getId() : null) + "-----------------------------------");
         logger.info(def);
-        MultiValueMap<String, String> sendForm = this.getMvm(this.device.getId(), controlDef);
+        MultiValueMap<String, String> sendForm = this.getMvm(device, device, controlDef);
         sendForm.add(TARGET_ID, String.valueOf(target.getId()));
         sendForm.add("f1", "12");
         sendForm.add("f2", "abfc");
         sendForm.add("f3", "1");
         sendForm.add(SR, ControlPacket.Send);
 
-        MultiValueMap<String, String> recvForm = this.getMvm(this.target.getId(), controlDef);
+        MultiValueMap<String, String> recvForm = this.getMvm(target, target, controlDef);
         recvForm.add(SR, ControlPacket.Recv);
         final ControlPacket[] sendResult = new ControlPacket[1];
         ControlPacket recvResult;
-        Thread sender = new Thread() {
-            public void run() {
-                try {
-                    byte[] sendBytes = ControlTest2.this.mockMvc.perform(post("/api/control").params(sendForm))
-                            .andDo(print()).andExpect(status().isOk())
-                            .andReturn().getResponse().getContentAsByteArray();
-                    sendResult[0] = objectMapper.readValue(sendBytes, ControlPacket.class);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        sender.start();
-        Thread.sleep(1000);
+
+        byte[] sendBytes = ControlTest2.this.mockMvc.perform(post("/api/control").params(sendForm))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsByteArray();
         byte[] recvBytes = ControlTest2.this.mockMvc.perform(post("/api/control").params(recvForm))
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsByteArray();
-        recvResult = objectMapper.readValue(recvBytes, ControlPacket.class);
-        sender.join();
-        assertThat(sendResult[0].getFellowPacketId(), is(recvResult.getId()));
-        assertThat(recvResult.getFellowPacketId(), is(sendResult[0].getId()));
     }
 }

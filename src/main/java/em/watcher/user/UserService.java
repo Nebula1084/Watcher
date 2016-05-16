@@ -56,7 +56,7 @@ public class UserService {
 
     @Transactional
     public User registerDevice(User user, Device device) throws Exception {
-        if (user.getReportDefs().stream().filter(device1 -> Objects.equals(device.getName(), device1.getName())).count() > 0)
+        if (user.getDevices().stream().filter(device1 -> Objects.equals(device.getName(), device1.getName())).count() > 0)
             throw new Exception("Device name duplicate.");
         user.addDevice(device);
         return userRepository.save(user);

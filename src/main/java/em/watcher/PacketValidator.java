@@ -20,7 +20,7 @@ public class PacketValidator {
     ContentMatcher contentMatcher;
 
     public boolean validatePacket(Map<String, String> params, WatcherPacketDef packetDef) throws IllegalArgumentException {
-        Set<String> fieldSet = packetDef.getField();
+        Set<String> fieldSet = new HashSet<>(packetDef.getField());
         Set<String> testSet = new HashSet<>();
         testSet.add(AUTH_ID);
         testSet.add(AUTH_KEY);

@@ -18,18 +18,19 @@ public class ReportTest extends PacketTest {
     @Rollback
     @Transactional
     public void testReport() throws Exception {
-        MultiValueMap<String, String> mvm = this.getMvm(this.device.getId(), reportDef);
+        MultiValueMap<String, String> mvm = this.getMvm(device, device, reportDef);
         mvm.add("f1", "12");
         mvm.add("f2", "sdfasdf");
         for (int i = 0; i < 200; i++)
             this.mockMvc.perform(post("/api/report").params(mvm)).andDo(print()).andExpect(status().isOk());
         mvm.add("f3", "sdfasdf");
         this.mockMvc.perform(post("/api/report").params(mvm)).andDo(print()).andExpect(status().isBadRequest());
-        mvm = this.getMvm(this.device.getId(), reportDef);
+        mvm = this.getMvm(device, device, reportDef);
         mvm.add("f3", "12");
         mvm.add("f2", "sdfasdf");
         this.mockMvc.perform(post("/api/report").params(mvm)).andDo(print()).andExpect(status().isBadRequest());
-        mvm = this.getMvm(100L, reportDef);
+        device.setId(100L);
+        mvm = this.getMvm(device, device, reportDef);
         mvm.add("f1", "12");
         mvm.add("f2", "sdfasdf");
         this.mockMvc.perform(post("/api/report").params(mvm)).andDo(print()).andExpect(status().isForbidden());
