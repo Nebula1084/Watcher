@@ -8,10 +8,5 @@
 *.iml
 gradlew*
 
-#image file
-*.jpg
-*.jpeg
-*.png
-
 #log file
 *.log
