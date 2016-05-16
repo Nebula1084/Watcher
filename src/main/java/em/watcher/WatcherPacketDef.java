@@ -11,6 +11,9 @@ public abstract class WatcherPacketDef {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String name;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> names;
     @ElementCollection(fetch = FetchType.EAGER)
     private Map<String, String> types;
     @ElementCollection(fetch = FetchType.EAGER)
@@ -26,6 +29,7 @@ public abstract class WatcherPacketDef {
     public WatcherPacketDef() {
         this.types = new LinkedHashMap<>();
         this.lengths = new LinkedHashMap<>();
+        this.names = new LinkedList<>();
     }
 
     public WatcherPacketDef(String name) {
@@ -70,12 +74,14 @@ public abstract class WatcherPacketDef {
         if (!isType(type, length)) throw new Exception("type is invalid.");
         if ((1 > length) || (length > 1000)) throw new Exception("length is invalid.");
         if (types.containsKey(name)) throw new Exception("this field already exists");
+
         types.put(name, type);
         lengths.put(name, length);
+        names.add(name);
     }
 
-    public Set<String> getField() {
-        return types.keySet();
+    public List<String> getField() {
+        return names;
     }
 
     public Boolean isType(String type, Integer length) {

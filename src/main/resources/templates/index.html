@@ -114,7 +114,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                             th:each="controlDef,rowStat : ${curUser.getControlDefs()}">
                             <th scope="row" th:text="${controlDef.getId()}"></th>
                             <td th:text="${controlDef.getName()}"></td>
-                            <td th:text="${controlDef.getType(fields)}"
+                            <td th:text="${fields}+':'+${controlDef.getType(fields)}+'('+${controlDef.getLength(fields)}+')'"
                                 th:each="fields : ${controlDef.getField()}"></td>
                         </tr>
                     </table>
@@ -132,7 +132,8 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                             th:each="reportDef,rowStat : ${curUser.getReportDefs()}">
                             <th scope="row" th:text="${reportDef.getId()}"></th>
                             <td th:text="${reportDef.getName()}"></td>
-                            <td th:text="${reportDef.getType(fields)}" th:each="fields : ${reportDef.getField()}"></td>
+                            <td th:text="${fields}+':'+${reportDef.getType(fields)}+'('+${reportDef.getLength(fields)}+')'"
+                                th:each="fields : ${reportDef.getField()}"></td>
                         </tr>
                     </table>
                 </div>

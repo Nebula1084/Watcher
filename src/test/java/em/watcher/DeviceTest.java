@@ -19,11 +19,12 @@ public class DeviceTest extends ManageTest {
 
     }
 
-    @Test
+    @Test(expected = Exception.class)
     public void test() throws Exception {
         User user = new User("user11", "123", "123");
         this.userService.register(user);
         Device device = new Device("test");
+        userService.registerDevice(user, device);
         userService.registerDevice(user, device);
     }
 }
