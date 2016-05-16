@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 @RestController
@@ -61,7 +62,8 @@ public class PacketController {
             if (ret == null)
                 sendError(response, 404, "Target is not available.");
             else {
-                objectMapper.writeValue(response.getWriter(), ret);
+                if (Objects.equals(ret.getSR(), ControlPacket.Send))
+                    objectMapper.writeValue(response.getWriter(), ret);
             }
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
