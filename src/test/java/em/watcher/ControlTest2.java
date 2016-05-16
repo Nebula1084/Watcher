@@ -20,7 +20,6 @@ public class ControlTest2 extends PacketTest {
     ObjectMapper objectMapper = new ObjectMapper();
 
 
-
     @Test
     public void testControl() throws Exception {
         ControlDef def = controlService.getControlDef(controlDef.getId());
@@ -38,26 +37,12 @@ public class ControlTest2 extends PacketTest {
         recvForm.add(SR, ControlPacket.Recv);
         final ControlPacket[] sendResult = new ControlPacket[1];
         ControlPacket recvResult;
-        Thread sender = new Thread() {
-            public void run() {
-                try {
-                    byte[] sendBytes = ControlTest2.this.mockMvc.perform(post("/api/control").params(sendForm))
-                            .andDo(print()).andExpect(status().isOk())
-                            .andReturn().getResponse().getContentAsByteArray();
-                    sendResult[0] = objectMapper.readValue(sendBytes, ControlPacket.class);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        sender.start();
-        Thread.sleep(1000);
+
+        byte[] sendBytes = ControlTest2.this.mockMvc.perform(post("/api/control").params(sendForm))
+                .andDo(print()).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsByteArray();
         byte[] recvBytes = ControlTest2.this.mockMvc.perform(post("/api/control").params(recvForm))
                 .andDo(print()).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsByteArray();
-        recvResult = objectMapper.readValue(recvBytes, ControlPacket.class);
-        sender.join();
-        assertThat(sendResult[0].getFellowPacketId(), is(recvResult.getId()));
-        assertThat(recvResult.getFellowPacketId(), is(sendResult[0].getId()));
     }
 }

@@ -67,35 +67,46 @@ public class ControlService {
     }
 
     public ControlPacket sendControl(Device device, ControlPacket packet) {
-        synchronized (packet) {
-            packetPool.offer(device, packet);
-            try {
-                packet.wait(10000);
-                packetRepository.save(packet);
-                if (Objects.equals(packet.getFellowPacketId(), ControlPacket.NO_FELLOW)) {
-                    packetPool.remove(device, packet);
-                } else {
-                    return packetRepository.findById(packet.getFellowPacketId()).get(0);
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
+        packetPool.offer(device, packet);
+        packetRepository.save(packet);
+        return new ControlPacket();
     }
 
     public ControlPacket recvControl(Device device, ControlPacket packet) {
         ControlPacket recvPacket = packetPool.poll(device);
-        if (recvPacket == null)
-            return null;
-        synchronized (recvPacket) {
-            recvPacket.setFellowPacketId(packet.getId());
-            packet.setFellowPacketId(recvPacket.getId());
-            packetRepository.save(packet);
-            recvPacket.notify();
-        }
+        packetRepository.save(packet);
         return recvPacket;
     }
+//    public ControlPacket sendControl(Device device, ControlPacket packet) {
+//        synchronized (packet) {
+//            packetPool.offer(device, packet);
+//            try {
+//                packet.wait(10000);
+//                packetRepository.save(packet);
+//                if (Objects.equals(packet.getFellowPacketId(), ControlPacket.NO_FELLOW)) {
+//                    packetPool.remove(device, packet);
+//                } else {
+//                    return packetRepository.findById(packet.getFellowPacketId()).get(0);
+//                }
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        return null;
+//    }
+//
+//    public ControlPacket recvControl(Device device, ControlPacket packet) {
+//        ControlPacket recvPacket = packetPool.poll(device);
+//        if (recvPacket == null)
+//            return null;
+//        synchronized (recvPacket) {
+//            recvPacket.setFellowPacketId(packet.getId());
+//            packet.setFellowPacketId(recvPacket.getId());
+//            packetRepository.save(packet);
+//            recvPacket.notify();
+//        }
+//        return recvPacket;
+//    }
 
 
     public ControlPacket recordControl(ControlPacket controlPacket) {

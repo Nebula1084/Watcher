@@ -10,6 +10,7 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class ReportlPacket extends WatcherPacket {
+    final static public String CACHE = "ReportlPackets";
     public ReportlPacket() {
         super();
     }

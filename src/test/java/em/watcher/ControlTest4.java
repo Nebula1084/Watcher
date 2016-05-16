@@ -6,10 +6,6 @@ import em.watcher.control.ControlPacket;
 import org.junit.Test;
 import org.springframework.util.MultiValueMap;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import static em.watcher.conroller.PacketController.SR;
 import static em.watcher.conroller.PacketController.TARGET_ID;
 import static org.hamcrest.CoreMatchers.is;
@@ -21,7 +17,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ControlTest4 extends PacketTest {
     ObjectMapper objectMapper = new ObjectMapper();
     final int[] count = new int[1];
-    Map<Long, ControlPacket> packetMap = Collections.synchronizedMap(new HashMap<>());
 
     class TestThread extends Thread {
         MultiValueMap<String, String> sendForm;
@@ -36,31 +31,23 @@ public class ControlTest4 extends PacketTest {
         public void run() {
             final ControlPacket[] sendResult = new ControlPacket[1];
             ControlPacket recvResult = new ControlPacket();
-            Thread sender = new Thread() {
-                public void run() {
-                    try {
-                        byte[] sendBytes = ControlTest4.this.mockMvc.perform(post("/api/control").params(sendForm))
-                                .andDo(print()).andExpect(status().isOk())
-                                .andReturn().getResponse().getContentAsByteArray();
-                        sendResult[0] = ControlTest4.this.objectMapper.readValue(sendBytes, ControlPacket.class);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            };
-            sender.start();
+
             try {
-                sleep(1000);
+                byte[] sendBytes = ControlTest4.this.mockMvc.perform(post("/api/control").params(sendForm))
+                        .andDo(print()).andExpect(status().isOk())
+                        .andReturn().getResponse().getContentAsByteArray();
+                synchronized (count) {
+                    count[0]++;
+                }
                 byte[] recvBytes = ControlTest4.this.mockMvc.perform(post("/api/control").params(recvForm))
                         .andDo(print()).andExpect(status().isOk())
                         .andReturn().getResponse().getContentAsByteArray();
-                recvResult = ControlTest4.this.objectMapper.readValue(recvBytes, ControlPacket.class);
-                sender.join();
+                synchronized (count) {
+                    count[0]++;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            packetMap.put(sendResult[0].getId(), sendResult[0]);
-            packetMap.put(recvResult.getId(), recvResult);
         }
     }
 
@@ -79,19 +66,14 @@ public class ControlTest4 extends PacketTest {
 
         MultiValueMap<String, String> recvForm = this.getMvm(this.target.getId(), controlDef);
         recvForm.add(SR, ControlPacket.Recv);
-        TestThread[] threads = new TestThread[50];
-        for (int i = 0; i < 50; i++) {
+        TestThread[] threads = new TestThread[100];
+        for (int i = 0; i < 100; i++) {
             threads[i] = new TestThread(sendForm, recvForm);
             threads[i].start();
         }
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 100; i++) {
             threads[i].join();
         }
-        for (Long key : packetMap.keySet()) {
-            ControlPacket packet = packetMap.get(key);
-            ControlPacket fellow = packetMap.get(packet.getFellowPacketId());
-            assertThat(fellow.getFellowPacketId(), is(packet.getId()));
-        }
-        assertThat(packetMap.size(), is(100));
+        assertThat(count[0], is(200));
     }
 }

@@ -48,7 +48,6 @@ public class ReportService {
         this.report(packet);
     }
 
-
     public void report(ReportlPacket reportlPacket) {
         packetRepository.save(reportlPacket);
     }

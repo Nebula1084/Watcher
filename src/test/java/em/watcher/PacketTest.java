@@ -97,7 +97,7 @@ public abstract class PacketTest {
     protected MultiValueMap<String, String> getMvm(Long id, WatcherPacketDef packetDef) {
         LinkedMultiValueMap<String, String> mvm = new LinkedMultiValueMap<>();
         mvm.add(AUTH_ID, String.valueOf(id));
-        mvm.add(AUTH_KEY, "sdf");
+        mvm.add(AUTH_KEY, device.getKey());
         mvm.add(DEVICE_ID, String.valueOf(id));
         if (packetDef instanceof ReportDef)
             mvm.add(REPORT_ID, String.valueOf(packetDef.getId()));

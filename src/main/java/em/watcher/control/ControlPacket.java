@@ -11,7 +11,7 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class ControlPacket extends WatcherPacket {
-    private String SR;
+    private String SR = "N";
     private Long targetId = NO_TARGET;
     private Long fellowPacketId = NO_FELLOW;
 
