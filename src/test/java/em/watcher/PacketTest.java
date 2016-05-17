@@ -94,11 +94,11 @@ public abstract class PacketTest {
         assertThat(controlService.getControlDef(controlDef.getId()) == null, not(true));
     }
 
-    protected MultiValueMap<String, String> getMvm(Long id, WatcherPacketDef packetDef) {
+    protected MultiValueMap<String, String> getMvm(Device auth, Device device, WatcherPacketDef packetDef) {
         LinkedMultiValueMap<String, String> mvm = new LinkedMultiValueMap<>();
-        mvm.add(AUTH_ID, String.valueOf(id));
-        mvm.add(AUTH_KEY, device.getKey());
-        mvm.add(DEVICE_ID, String.valueOf(id));
+        mvm.add(AUTH_ID, String.valueOf(auth.getId()));
+        mvm.add(AUTH_KEY, auth.getKey());
+        mvm.add(DEVICE_ID, String.valueOf(device.getId()));
         if (packetDef instanceof ReportDef)
             mvm.add(REPORT_ID, String.valueOf(packetDef.getId()));
         else if (packetDef instanceof ControlDef)

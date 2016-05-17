@@ -21,7 +21,7 @@ public class ControlTest extends PacketTest {
     @Test
     @Transactional
     public void testSend() throws Exception {
-        MultiValueMap<String, String> mvm = this.getMvm(this.device.getId(), controlDef);
+        MultiValueMap<String, String> mvm = this.getMvm(device, device, controlDef);
         mvm.add(TARGET_ID, String.valueOf(target.getId()));
         mvm.add("f1", "12");
         mvm.add("f2", "sdfasdf");
@@ -34,13 +34,13 @@ public class ControlTest extends PacketTest {
     @Test
     @Transactional
     public void testRecv() throws Exception {
-        MultiValueMap<String, String> mvm = this.getMvm(this.target.getId(), controlDef);
+        MultiValueMap<String, String> mvm = this.getMvm(target,target, controlDef);
         mvm.add("f1", "12");
         mvm.add("f2", "sdfasdf");
         mvm.add("f3", "1");
         mvm.add("sr", "R");
         this.mockMvc.perform(post("/api/control").params(mvm)).andDo(print()).andExpect(status().isBadRequest());
-        mvm = this.getMvm(this.device.getId(), controlDef);
+        mvm = this.getMvm(device, device, controlDef);
         mvm.add("sr", "R");
         this.mockMvc.perform(post("/api/control").params(mvm)).andDo(print()).andExpect(status().isNotFound());
     }
@@ -51,14 +51,14 @@ public class ControlTest extends PacketTest {
         assertThat(def != null, is(true));
         System.out.println("------------------------------" + (def != null ? def.getId() : null) + "-----------------------------------");
         logger.info(def);
-        MultiValueMap<String, String> sendForm = this.getMvm(this.device.getId(), controlDef);
+        MultiValueMap<String, String> sendForm = this.getMvm(device, device, controlDef);
         sendForm.add(TARGET_ID, String.valueOf(target.getId()));
         sendForm.add("f1", "12");
         sendForm.add("f2", "abc");
         sendForm.add("f3", "1");
         sendForm.add(SR, ControlPacket.Send);
 
-        MultiValueMap<String, String> recvForm = this.getMvm(this.target.getId(), controlDef);
+        MultiValueMap<String, String> recvForm = this.getMvm(target, target, controlDef);
         recvForm.add(SR, ControlPacket.Recv);
         Thread sender = new Thread() {
             public void run() {

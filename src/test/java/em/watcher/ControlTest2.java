@@ -26,14 +26,14 @@ public class ControlTest2 extends PacketTest {
         assertThat(def != null, is(true));
         System.out.println("------------------------------" + (def != null ? def.getId() : null) + "-----------------------------------");
         logger.info(def);
-        MultiValueMap<String, String> sendForm = this.getMvm(this.device.getId(), controlDef);
+        MultiValueMap<String, String> sendForm = this.getMvm(device, device, controlDef);
         sendForm.add(TARGET_ID, String.valueOf(target.getId()));
         sendForm.add("f1", "12");
         sendForm.add("f2", "abfc");
         sendForm.add("f3", "1");
         sendForm.add(SR, ControlPacket.Send);
 
-        MultiValueMap<String, String> recvForm = this.getMvm(this.target.getId(), controlDef);
+        MultiValueMap<String, String> recvForm = this.getMvm(target, target, controlDef);
         recvForm.add(SR, ControlPacket.Recv);
         final ControlPacket[] sendResult = new ControlPacket[1];
         ControlPacket recvResult;
