@@ -66,14 +66,14 @@ public class ControlTest4 extends PacketTest {
 
         MultiValueMap<String, String> recvForm = this.getMvm(target, target, controlDef);
         recvForm.add(SR, ControlPacket.Recv);
-        TestThread[] threads = new TestThread[100];
-        for (int i = 0; i < 100; i++) {
+        TestThread[] threads = new TestThread[10];
+        for (int i = 0; i < 10; i++) {
             threads[i] = new TestThread(sendForm, recvForm);
             threads[i].start();
         }
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             threads[i].join();
         }
-        assertThat(count[0], is(200));
+        assertThat(count[0], is(20));
     }
 }

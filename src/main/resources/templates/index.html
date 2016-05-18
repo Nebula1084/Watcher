@@ -77,6 +77,12 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                             Register control
                         </a>
                     </li>
+                    <li>
+                        <a href="/help.html">
+                            <i class="fa fa-h-square nav_icon"></i>
+                            Help
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -111,7 +117,8 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                         </tr>
                         </thead>
                         <tr th:class="${rowStat.odd} ? 'active' : 'success'"
-                            th:each="controlDef,rowStat : ${curUser.getControlDefs()}">
+                            th:each="controlDef,rowStat : ${curUser.getControlDefs()}"
+                            th:onclick="'javascript:window.location.href=\'/statistics/control/'+${controlDef.getId()}+'.html\''">
                             <th scope="row" th:text="${controlDef.getId()}"></th>
                             <td th:text="${controlDef.getName()}"></td>
                             <td th:text="${fields}+':'+${controlDef.getType(fields)}+'('+${controlDef.getLength(fields)}+')'"
@@ -129,7 +136,8 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                         </tr>
                         </thead>
                         <tr th:class="${rowStat.odd} ? 'active' : 'success'"
-                            th:each="reportDef,rowStat : ${curUser.getReportDefs()}">
+                            th:each="reportDef,rowStat : ${curUser.getReportDefs()}"
+                            th:onclick="'javascript:window.location.href=\'/statistics/report/'+${reportDef.getId()}+'.html\''">
                             <th scope="row" th:text="${reportDef.getId()}"></th>
                             <td th:text="${reportDef.getName()}"></td>
                             <td th:text="${fields}+':'+${reportDef.getType(fields)}+'('+${reportDef.getLength(fields)}+')'"

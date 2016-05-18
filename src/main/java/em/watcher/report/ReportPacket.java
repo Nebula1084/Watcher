@@ -9,9 +9,9 @@ import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class ReportlPacket extends WatcherPacket {
+public class ReportPacket extends WatcherPacket {
     final static public String CACHE = "ReportlPackets";
-    public ReportlPacket() {
+    public ReportPacket() {
         super();
     }
 

@@ -38,7 +38,7 @@ public class ReportService {
             throw new Exception("Device " + deviceId + " doesn't exist.");
         reportDef = this.getReportDef(reportId);
         packetValidator.validatePacket(params, reportDef);
-        ReportlPacket packet = new ReportlPacket();
+        ReportPacket packet = new ReportPacket();
         packet.setAuthId(authId);
         packet.setDeviceId(deviceId);
         packet.setDefId(reportDef.getId());
@@ -48,16 +48,19 @@ public class ReportService {
         this.report(packet);
     }
 
-    public void report(ReportlPacket reportlPacket) {
-        packetRepository.save(reportlPacket);
+    public void report(ReportPacket reportPacket) {
+        packetRepository.save(reportPacket);
     }
 
-    @Cacheable(ReportDef.CACHE)
     public ReportDef getReportDef(Long id) throws Exception {
         List<ReportDef> reportDefs = reportDefRepository.findById(id);
         if (reportDefs.isEmpty())
             throw new Exception("Report " + id + " doesn't exist.");
         else
             return reportDefs.get(0);
+    }
+
+    public List<ReportPacket> getReportPackets(ReportDef reportDef) {
+        return packetRepository.findByDefIdOrderByTime(reportDef.getId());
     }
 }

@@ -1,6 +1,5 @@
 package em.watcher.mouse;
 
-import em.watcher.WatcherPacketDef;
 import em.watcher.control.ControlDef;
 import em.watcher.control.ControlPacket;
 import em.watcher.control.ControlService;
@@ -8,17 +7,13 @@ import em.watcher.device.Device;
 import em.watcher.device.DeviceService;
 import em.watcher.report.ReportDef;
 import em.watcher.report.ReportService;
-import em.watcher.report.ReportlPacket;
+import em.watcher.report.ReportPacket;
 
-import javax.persistence.Entity;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Map;
 
 class ReadFieldException extends Exception {
     ReadFieldException(String msg) {
@@ -198,7 +193,7 @@ public class MouseSession extends Thread {
             ReportDef def = reportService.getReportDef((long) report_id);
 
             System.out.println("Name: " + def.getName());
-            ReportlPacket packet = new ReportlPacket();
+            ReportPacket packet = new ReportPacket();
             packet.setAuthId((long) auth_id);
             packet.setDeviceId((long) device_id);
             packet.setDefId(def.getId());

@@ -113,12 +113,15 @@ public class ControlService {
         return packetRepository.save(controlPacket);
     }
 
-    @Cacheable(ControlDef.CACHE)
     public ControlDef getControlDef(Long id) throws Exception {
         List<ControlDef> controlDefs = controlDefRepository.findById(id);
         if (controlDefs.isEmpty())
             throw new Exception("Control " + id + " doesn't exist");
         else
             return controlDefs.get(0);
+    }
+
+    public List<ControlPacket> getControlPackets(ControlDef controlDef) {
+        return packetRepository.findByDefIdOrderByTime(controlDef.getId());
     }
 }

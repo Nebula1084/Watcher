@@ -19,6 +19,9 @@ public class WatcherView implements Sessionable {
     public static final String controlRgstPage = "register_control.html";
     public static final String reportRgstPage = "register_report.html";
     public static final String deviceRgstPage = "register_device.html";
+    public static final String helpPage = "help.html";
+    public static final String reportStatisticsPage = "report_statistics.html";
+    public static final String controlStatisticsPage = "control_statistics.html";
 
     @RequestMapping(value = {"/error"}, method = {RequestMethod.GET})
     public String error() {
@@ -66,5 +69,10 @@ public class WatcherView implements Sessionable {
     @RequestMapping(value = "/" + WatcherView.deviceRgstPage)
     public String deviceRgstPage(@ModelAttribute(Sessionable.User) User user, Model model) {
         return WatcherView.deviceRgstPage;
+    }
+
+    @RequestMapping(value = "/" + WatcherView.helpPage)
+    public String helpPage(@ModelAttribute(Sessionable.User) User user, Model model) {
+        return WatcherView.helpPage;
     }
 }

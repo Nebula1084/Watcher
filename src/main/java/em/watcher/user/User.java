@@ -9,6 +9,7 @@ import java.util.*;
 
 @Entity
 public class User {
+    final static public String CACHE = "Users";
     @Id
     private String account = "";
     private String password = "";

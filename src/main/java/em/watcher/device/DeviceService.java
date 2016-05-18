@@ -12,10 +12,7 @@ public class DeviceService {
     DeviceRepository deviceRepository;
 
     public boolean authenticate(Long id, String key) throws Exception {
-        List<Device> devices = deviceRepository.findById(id);
-        if (devices.isEmpty())
-            throw new Exception("Device " + id + " doesn;t exist.");
-        Device device = devices.get(0);
+        Device device = findDevice(id);
         return device.authenticate(key);
     }
 
