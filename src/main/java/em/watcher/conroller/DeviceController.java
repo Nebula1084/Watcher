@@ -117,7 +117,7 @@ public class DeviceController {
             context.setVariable("latestControl", latestControl);
             context.setVariable("latestReport", latestReport);
         }
-        return "/device/overview.html";
+        return "device/overview.html";
     }
 
     @RequestMapping(value = "/device/send/report/{defId}.html")
@@ -130,14 +130,14 @@ public class DeviceController {
                 WebContext context = new org.thymeleaf.context.WebContext(null, null, null);
                 context.setVariable("packetDef", reportDef);
             }
-            return "/device/send.html :: send(target='report',id='" + defId + "')";
+            return "device/send.html :: send(target='report',id='" + defId + "')";
         } catch (Exception e) {
             e.printStackTrace();
-            return "redirect:/device/view/" + device.getId() + ".html";
+            return "redirect:device/view/" + device.getId() + ".html";
         }
     }
 
-    @RequestMapping(value = "/device/send/control/{defId}.html")
+    @RequestMapping(value = "device/send/control/{defId}.html")
     public String sendControl(@PathVariable("defId") Long defId, Model model,
                               @ModelAttribute(DEVICE) Device device) {
         try {
@@ -148,10 +148,10 @@ public class DeviceController {
                 WebContext context = new org.thymeleaf.context.WebContext(null, null, null);
                 context.setVariable("packetDef", controlDef);
             }
-            return "/device/send.html :: send(target='control',id='" + defId + "')";
+            return "device/send.html :: send(target='control',id='" + defId + "')";
         } catch (Exception e) {
             e.printStackTrace();
-            return "redirect:/device/view/" + device.getId() + ".html";
+            return "redirect:device/view/" + device.getId() + ".html";
         }
     }
 
@@ -167,10 +167,10 @@ public class DeviceController {
                 WebContext context = new org.thymeleaf.context.WebContext(null, null, null);
                 context.setVariable("packets", packets);
             }
-            return "/device/log.html :: log(target='report', page=" + (pageable.getPageNumber() + 1) + ", page_count=" + packets.getTotalPages() + ")";
+            return "device/log.html :: log(target='report', page=" + (pageable.getPageNumber() + 1) + ", page_count=" + packets.getTotalPages() + ")";
         } catch (Exception e) {
             e.printStackTrace();
-            return "/device/overview.html";
+            return "device/overview.html";
         }
     }
 
@@ -187,10 +187,10 @@ public class DeviceController {
                 WebContext context = new org.thymeleaf.context.WebContext(null, null, null);
                 context.setVariable("packets", packets);
             }
-            return "/device/log.html :: log(target='control', page=" + (pageable.getPageNumber() + 1) + ", page_count=" + packets.getTotalPages() + ")";
+            return "device/log.html :: log(target='control', page=" + (pageable.getPageNumber() + 1) + ", page_count=" + packets.getTotalPages() + ")";
         } catch (Exception e) {
             e.printStackTrace();
-            return "/device/overview.html";
+            return "device/overview.html";
         }
 
     }
