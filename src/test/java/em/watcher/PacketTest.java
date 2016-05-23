@@ -8,13 +8,9 @@ import em.watcher.device.DeviceRepository;
 import em.watcher.device.DeviceService;
 import em.watcher.report.ReportDef;
 import em.watcher.user.User;
-import em.watcher.user.UserRepository;
 import em.watcher.user.UserService;
 import org.apache.log4j.Logger;
-import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
@@ -23,13 +19,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import static em.watcher.conroller.PacketController.*;
-import static em.watcher.conroller.PacketController.CONTROL_ID;
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -97,7 +92,7 @@ public abstract class PacketTest {
     protected MultiValueMap<String, String> getMvm(Device auth, Device device, WatcherPacketDef packetDef) {
         LinkedMultiValueMap<String, String> mvm = new LinkedMultiValueMap<>();
         mvm.add(AUTH_ID, String.valueOf(auth.getId()));
-        mvm.add(AUTH_KEY, auth.getKey());
+        mvm.add(AUTH_KEY, auth.getSecret());
         mvm.add(DEVICE_ID, String.valueOf(device.getId()));
         if (packetDef instanceof ReportDef)
             mvm.add(REPORT_ID, String.valueOf(packetDef.getId()));

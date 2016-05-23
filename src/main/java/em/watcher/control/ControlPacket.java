@@ -4,10 +4,7 @@ import em.watcher.WatcherPacket;
 import em.watcher.device.Device;
 import em.watcher.report.ReportDef;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Entity
 public class ControlPacket extends WatcherPacket {

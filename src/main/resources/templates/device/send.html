@@ -1,0 +1,28 @@
+<form xmlns:th="http://www.thymeleaf.org" th:fragment="send (target, id)"
+      th:action="'/device/'+${target}+'.do?'+${target}+'_id='+${id}" method="post" role="form" class="form-horizontal">
+
+    <h4 th:text="${packetDef.getName()}"></h4>
+
+    <div class="form-group" th:each="fields:${packetDef.getField()}">
+        <label class="col-md-2 packetDef-label"
+               th:text="${fields}"></label>
+        <div class="col-md-8">
+            <div class="input-group">
+									<span class="input-group-addon"
+                                          th:text="${packetDef.getType(fields)}+'('+${packetDef.getLength(fields)}+')'">
+									</span>
+                <input type="password" class="form-control1"
+                       th:name="${fields}" placeholder="Password" data-toggle="popover"
+                       data-placement="right" autofocus=""/>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-sm-8 col-sm-offset-2">
+            <input type="submit" class="btn-success btn" value="submit"/>
+        </div>
+    </div>
+
+</form>

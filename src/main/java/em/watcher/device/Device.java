@@ -18,6 +18,7 @@ public class Device {
     private Long id;
     private String userAccount;
     private String name;
+    private String secret;
 
     public Device() {
 
@@ -25,6 +26,7 @@ public class Device {
 
     public Device(String name) {
         this.name = name;
+
     }
 
     public void setId(Long id) {
@@ -41,18 +43,30 @@ public class Device {
 
     public void setUserAccount(String userAccount) {
         this.userAccount = userAccount;
+        String tmp = "";
+
+        try {
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            md5.update(userAccount.getBytes());
+            tmp = byte2hex(md5.digest()) + name;
+            md5.update(tmp.getBytes());
+            tmp = byte2hex(md5.digest());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        this.secret = tmp;
     }
 
     public String getUserAccount() {
         return userAccount;
     }
 
-    private static String byte2hex(byte [] buffer){
+    private static String byte2hex(byte[] buffer) {
         String h = "";
 
-        for(int i = 0; i < buffer.length; i++){
+        for (int i = 0; i < buffer.length; i++) {
             String temp = Integer.toHexString(buffer[i] & 0xFF);
-            if(temp.length() == 1){
+            if (temp.length() == 1) {
                 temp = "0" + temp;
             }
             h = h + temp;
@@ -62,23 +76,11 @@ public class Device {
     }
 
     public boolean authenticate(String key) {
-        return getKey().equals(key);
+        return getSecret().equals(key);
     }
 
-    public String getKey() {
-        String tmp = "";
-
-        try {
-            MessageDigest md5 = MessageDigest.getInstance("MD5");
-            md5.update(id.toString().getBytes());
-            tmp = byte2hex(md5.digest()) + name;
-            md5.update(tmp.getBytes());
-            tmp = byte2hex(md5.digest());
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        
-        return tmp;
+    public String getSecret() {
+        return secret;
     }
 
     @Override
@@ -95,6 +97,6 @@ public class Device {
 
     @Override
     public String toString() {
-        return String.format("{id : %s, name : %s, user : %s}", id, name, userAccount);
+        return String.format("{id : %s, name : %s, user : %s, secret : %s}", id, name, userAccount, secret);
     }
 }

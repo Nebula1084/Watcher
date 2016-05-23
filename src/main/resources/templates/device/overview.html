@@ -1,0 +1,41 @@
+<div xmlns:th="http://www.thymeleaf.org">
+    <h4>Latest Control </h4>
+    <div th:each="def : ${latestControl.keySet()}">
+        <table class="table table-bordered" th:with="packet=${latestControl.get(def)}">
+            <thead>
+            <tr>
+                <th>Control Name</th>
+                <th>Control Id</th>
+                <th>Time</th>
+                <th th:each="field:${def.getField()}" th:text="${field}"></th>
+            </tr>
+            </thead>
+            <tr class="active">
+                <th scope="row" th:text="${def.getName()}"></th>
+                <td th:text="${packet.getId()}"></td>
+                <td th:text="${packet.getTime()}"></td>
+                <td th:each="field:${def.getField()}" th:text="${packet.getField(field)}"></td>
+            </tr>
+        </table>
+
+    </div>
+    <h4>Latest Report</h4>
+    <div th:each="def : ${latestReport.keySet()}">
+        <table class="table table-bordered" th:with="packet=${latestReport.get(def)}">
+            <thead>
+            <tr>
+                <th>Control Name</th>
+                <th>Control Id</th>
+                <th>Time</th>
+                <th th:each="field : ${def.getField()}" th:text="${field}"></th>
+            </tr>
+            </thead>
+            <tr class="active">
+                <th scope="row" th:text="${def.getName()}"></th>
+                <td th:text="${packet.getId()}"></td>
+                <td th:text="${packet.getTime()}"></td>
+                <td th:each="field:${def.getField()}" th:text="${packet.getField(field)}"></td>
+            </tr>
+        </table>
+    </div>
+</div>

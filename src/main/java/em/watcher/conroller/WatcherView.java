@@ -20,8 +20,7 @@ public class WatcherView implements Sessionable {
     public static final String reportRgstPage = "register_report.html";
     public static final String deviceRgstPage = "register_device.html";
     public static final String helpPage = "help.html";
-    public static final String reportStatisticsPage = "report_statistics.html";
-    public static final String controlStatisticsPage = "control_statistics.html";
+    public static final String devicePage = "device.html";
 
     @RequestMapping(value = {"/error"}, method = {RequestMethod.GET})
     public String error() {

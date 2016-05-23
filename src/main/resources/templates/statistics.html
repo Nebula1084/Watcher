@@ -1,0 +1,88 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="statistics (target, page, page_count)">
+<head>
+    <title>Control</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="keywords" content="Modern Responsive web template, Bootstrap Web Templates, Flat Web Templates, Andriod Compatible web template,
+Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyErricsson, Motorola web design"/>
+    <link href="/css/bootstrap.min.css" rel='stylesheet' type='text/css'/>
+    <link href="/css/style.css" rel='stylesheet' type='text/css'/>
+    <link href="/css/font-awesome.css" rel="stylesheet"/>
+    <script src="/js/jquery.min.js"></script>
+    <link href='http://fonts.useso.com/css?family=Roboto:400,100,300,500,700,900' rel='stylesheet' type='text/css'/>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/bootstrap-paginator.js"></script>
+    <script src="/js/myUtil.js"></script>
+
+    <script th:inline="javascript">
+
+
+        addEventListener("load", function () {
+            setTimeout(hideURLbar, 0);
+        }, false);
+        function hideURLbar() {
+            window.scrollTo(0, 1);
+        }
+
+    </script>
+</head>
+<body>
+<div id="wrapper">
+    <nav th:replace="index.html :: navigator">
+
+    </nav>
+    <div id="page-wrapper">
+        <div class="col-md-12 graphs">
+            <div class="xs">
+                <h3 th:text="${target}+' '+${packetDef.getName()}+' Statistics'"></h3>
+
+                <div class="panel-body">
+                    <h4>Log</h4>
+
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Packet id</th>
+                            <th>Packet Time</th>
+                            <th th:each="field:${packetDef.getField()}" th:text="${field}"></th>
+                        </tr>
+                        </thead>
+                        <tr th:class="${rowStat.odd} ? 'active' : 'success'"
+                            th:each="packet,rowStat : ${packets}">
+                            <th scope="row" th:text="${packet.getId()}"></th>
+                            <td th:text="${packet.getTime()}"></td>
+                            <td th:each="field:${packetDef.getField()}" th:text="${packet.getField(field)}"></td>
+                        </tr>
+                    </table>
+
+                    <ul class="pagination"></ul>
+                    <script th:inline='javascript'>
+                        function callback(page_id) {
+                            window.location.href =
+                                    '/statistics/' + [[${target}]] + '.html?defId=' + [[${packetDef.getId()}]] + [[${andChar}]] + 'page=' + (page_id - 1);
+                        }
+
+                        $(function () {
+                            $('.pagination').paginator({
+                                current_page: [[${page}]],
+                                page_count: [[${page_count}]],
+                                button_number: 10,
+                                pager_click: callback
+                            });
+
+                            $('[data-toggle="tooltip"]').tooltip();
+                        });
+                    </script>
+                </div>
+            </div>
+            <div th:replace="index.html :: footer">
+            </div>
+        </div>
+    </div>
+</div>
+<link href="/css/custom.css" rel="stylesheet"/>
+<script src="/js/metisMenu.min.js"></script>
+<script src="/js/custom.js"></script>
+</body>
+</html>

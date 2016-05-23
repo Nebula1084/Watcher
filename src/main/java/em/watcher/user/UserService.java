@@ -65,7 +65,7 @@ public class UserService {
 
     @Transactional
     public User registerControl(User user, ControlDef controlDef) throws Exception {
-        if (user.getReportDefs().stream().filter(controlDef1 -> Objects.equals(controlDef.getName(), controlDef1.getName())).count() > 0)
+        if (user.getControlDefs().stream().filter(controlDef1 -> Objects.equals(controlDef.getName(), controlDef1.getName())).count() > 0)
             throw new Exception("ControlDef name duplicate.");
         user.addControl(controlDef);
         return userRepository.save(user);

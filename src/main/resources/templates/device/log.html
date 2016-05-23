@@ -1,0 +1,37 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="log (target, page, page_count)">
+    <h4>Log</h4>
+
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Packet id</th>
+            <th>Packet Time</th>
+            <th th:each="field:${packetDef.getField()}" th:text="${field}"></th>
+        </tr>
+        </thead>
+        <tr th:class="${rowStat.odd} ? 'active' : 'success'"
+            th:each="packet,rowStat : ${packets}">
+            <th scope="row" th:text="${packet.getId()}"></th>
+            <td th:text="${packet.getTime()}"></td>
+            <td th:each="field:${packetDef.getField()}" th:text="${packet.getField(field)}"></td>
+        </tr>
+    </table>
+
+    <ul class="pagination"></ul>
+    <script th:inline='javascript'>
+        function callback(page_id) {
+            loadPage('content', '/device/log/' + [[${target}]] + '.html?defId=' + [[${packetDef.getId()}]] + [[${andChar}]] + 'page=' + (page_id-1));
+        }
+
+        $(function () {
+            $('.pagination').paginator({
+                current_page: [[${page}]],
+                page_count: [[${page_count}]],
+                button_number: 10,
+                pager_click: callback
+            });
+
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+</div>

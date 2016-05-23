@@ -98,12 +98,15 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                         <tr>
                             <th>Device id</th>
                             <th>Device name</th>
+                            <th>Device secret</th>
                         </tr>
                         </thead>
                         <tr th:class="${rowStat.odd} ? 'active' : 'success'"
-                            th:each="device,rowStat : ${curUser.getDevices()}">
+                            th:each="device,rowStat : ${curUser.getDevices()}"
+                            th:onclick="'javascript:window.location.href=\'/device/view/'+${device.getId()}+'.html\''">
                             <th scope="row" th:text="${device.getId()}"></th>
                             <td th:text="${device.getName()}"></td>
+                            <td th:text="${device.getSecret()}"></td>
                         </tr>
                     </table>
                 </div>
@@ -118,7 +121,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                         </thead>
                         <tr th:class="${rowStat.odd} ? 'active' : 'success'"
                             th:each="controlDef,rowStat : ${curUser.getControlDefs()}"
-                            th:onclick="'javascript:window.location.href=\'/statistics/control/'+${controlDef.getId()}+'.html\''">
+                            th:onclick="'javascript:window.location.href=\'/statistics/control.html?defId='+${controlDef.getId()}+'\''">
                             <th scope="row" th:text="${controlDef.getId()}"></th>
                             <td th:text="${controlDef.getName()}"></td>
                             <td th:text="${fields}+':'+${controlDef.getType(fields)}+'('+${controlDef.getLength(fields)}+')'"
@@ -137,7 +140,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                         </thead>
                         <tr th:class="${rowStat.odd} ? 'active' : 'success'"
                             th:each="reportDef,rowStat : ${curUser.getReportDefs()}"
-                            th:onclick="'javascript:window.location.href=\'/statistics/report/'+${reportDef.getId()}+'.html\''">
+                            th:onclick="'javascript:window.location.href=\'/statistics/report.html?defId='+${reportDef.getId()}+'\''">
                             <th scope="row" th:text="${reportDef.getId()}"></th>
                             <td th:text="${reportDef.getName()}"></td>
                             <td th:text="${fields}+':'+${reportDef.getType(fields)}+'('+${reportDef.getLength(fields)}+')'"

@@ -3,13 +3,15 @@ package em.watcher.control;
 import em.watcher.PacketValidator;
 import em.watcher.device.Device;
 import em.watcher.device.DeviceService;
+import em.watcher.report.ReportDef;
+import em.watcher.report.ReportPacket;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static em.watcher.conroller.PacketController.*;
 
@@ -26,8 +28,11 @@ public class ControlService {
     @Autowired
     private ControlPacketRepository packetRepository;
 
-
     public ControlPacket control(Map<String, String> params) throws Exception {
+        return control(params, true);
+    }
+
+    public ControlPacket control(Map<String, String> params, Boolean fromDevice) throws Exception {
         Long authId = Long.valueOf(params.get(AUTH_ID));
         String authKey = params.get(AUTH_KEY);
         Long controlId = Long.valueOf(params.get(CONTROL_ID));
@@ -35,13 +40,16 @@ public class ControlService {
         ControlDef controlDef;
         controlDef = this.getControlDef(controlId);
 
-        if (!deviceService.authenticate(authId, authKey))
+        if (fromDevice && !deviceService.authenticate(authId, authKey))
             throw new Exception("Authenticate failed.");
 
         packetValidator.validatePacket(params, controlDef);
 
         Long deviceId = Long.valueOf(params.get(DEVICE_ID));
-        Device device = deviceService.findDevice(deviceId);
+
+        Device device = null;
+        if (fromDevice)
+            device = deviceService.findDevice(deviceId);
 
         ControlPacket packet = new ControlPacket();
         packet.setAuthId(authId);
@@ -121,7 +129,19 @@ public class ControlService {
             return controlDefs.get(0);
     }
 
-    public List<ControlPacket> getControlPackets(ControlDef controlDef) {
-        return packetRepository.findByDefIdOrderByTime(controlDef.getId());
+    public Page<ControlPacket> getControlPackets(ControlDef controlDef, Pageable pageable) {
+        return packetRepository.findByDefId(controlDef.getId(), pageable);
+    }
+
+    public Page<ControlPacket> getControlPackets(ControlDef controlDef, Device device, Pageable pageable) {
+        return packetRepository.findByDefIdAndDeviceId(controlDef.getId(), device.getId(), pageable);
+    }
+
+    public ControlPacket getLatest(ControlDef controlDef) {
+        return packetRepository.getLatest(controlDef.getId());
+    }
+
+    public ControlPacket getLatest(ControlDef controlDef, Device device) {
+        return packetRepository.getLatest(controlDef.getId(), device.getId());
     }
 }

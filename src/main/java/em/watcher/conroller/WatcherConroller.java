@@ -49,6 +49,7 @@ public class WatcherConroller implements Sessionable {
             return "redirect:/" + WatcherView.indexPage;
         } catch (Exception e) {
             status.setException(e);
+            e.printStackTrace();
             return "redirect:/" + WatcherView.deviceRgstPage;
         }
     }
@@ -63,6 +64,7 @@ public class WatcherConroller implements Sessionable {
             return "redirect:/" + WatcherView.indexPage;
         } catch (Exception e) {
             status.setException(e);
+            e.printStackTrace();
             return "redirect:/" + WatcherView.reportRgstPage;
         }
     }
@@ -74,10 +76,11 @@ public class WatcherConroller implements Sessionable {
         try {
             controlDef = getControl(httpRequest);
             model.addAttribute(Sessionable.User, userService.registerControl(user, controlDef));
-            return "redirect:" + WatcherView.indexPage;
+            return "redirect:/" + WatcherView.indexPage;
         } catch (Exception e) {
             status.setException(e);
-            return "redirect:" + WatcherView.controlRgstPage;
+            e.printStackTrace();
+            return "redirect:/" + WatcherView.controlRgstPage;
         }
     }
 

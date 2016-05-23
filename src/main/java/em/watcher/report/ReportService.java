@@ -1,9 +1,11 @@
 package em.watcher.report;
 
 import em.watcher.PacketValidator;
+import em.watcher.device.Device;
 import em.watcher.device.DeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,15 +28,19 @@ public class ReportService {
     private ReportPacketRepository packetRepository;
 
     public void report(Map<String, String> params) throws Exception {
+        report(params, true);
+    }
+
+    public void report(Map<String, String> params, Boolean fromDevice) throws Exception {
         Long authId = Long.valueOf(params.get(AUTH_ID));
         String authKey = params.get(AUTH_KEY);
         Long deviceId = Long.valueOf(params.get(DEVICE_ID));
         Long reportId = Long.valueOf(params.get(REPORT_ID));
 
         ReportDef reportDef;
-        if (!deviceService.authenticate(authId, authKey))
+        if (fromDevice && !deviceService.authenticate(authId, authKey))
             throw new Exception("Authenticate failed.");
-        if (!deviceService.isExist(deviceId))
+        if (fromDevice && !deviceService.isExist(deviceId))
             throw new Exception("Device " + deviceId + " doesn't exist.");
         reportDef = this.getReportDef(reportId);
         packetValidator.validatePacket(params, reportDef);
@@ -60,7 +66,20 @@ public class ReportService {
             return reportDefs.get(0);
     }
 
-    public List<ReportPacket> getReportPackets(ReportDef reportDef) {
-        return packetRepository.findByDefIdOrderByTime(reportDef.getId());
+    public Page<ReportPacket> getReportPackets(ReportDef reportDef, Pageable pageable) {
+        return packetRepository.findByDefId(reportDef.getId(), pageable);
     }
+
+    public Page<ReportPacket> getReportPackets(ReportDef reportDef, Device device, Pageable pageable) {
+        return packetRepository.findByDefIdAndDeviceId(reportDef.getId(), device.getId(), pageable);
+    }
+
+    public ReportPacket getLatest(ReportDef reportDef) {
+        return packetRepository.getLatest(reportDef.getId());
+    }
+
+    public ReportPacket getLatest(ReportDef reportDef, Device device) {
+        return packetRepository.getLatest(reportDef.getId(), device.getId());
+    }
+
 }
