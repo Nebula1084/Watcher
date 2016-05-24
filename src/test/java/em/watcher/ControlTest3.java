@@ -36,7 +36,14 @@ public class ControlTest3 extends PacketTest {
         recvForm.add(SR, ControlPacket.Recv);
         ControlTest3.this.mockMvc.perform(post("/api/control").params(sendForm))
                 .andDo(print()).andExpect(status().isOk());
+//        Thread.sleep(2000L);
+        ControlTest3.this.mockMvc.perform(post("/api/control").params(recvForm))
+                .andDo(print()).andExpect(status().isOk());
+        ControlTest3.this.mockMvc.perform(post("/api/control").params(sendForm))
+                .andDo(print()).andExpect(status().isOk());
         ControlTest3.this.mockMvc.perform(post("/api/control").params(recvForm))
                 .andDo(print()).andExpect(status().isOk());
     }
+
+
 }

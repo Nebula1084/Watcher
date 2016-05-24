@@ -68,6 +68,10 @@ abstract public class WatcherPacket {
         return dateFormat.format(time);
     }
 
+    public Date getDate() {
+        return time;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof WatcherPacket)) return false;

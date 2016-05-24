@@ -75,17 +75,17 @@ public class ControlService {
     }
 
     public ControlPacket sendControl(Device device, ControlPacket packet) {
+        packet = packetRepository.save(packet);
         packetPool.offer(device, packet);
-        packetRepository.save(packet);
         return new ControlPacket();
     }
 
     public ControlPacket recvControl(Device device, ControlPacket packet) {
-        ControlPacket recvPacket = packetPool.poll(device);
         packetRepository.save(packet);
-        return recvPacket;
+        return packetPool.poll(device);
     }
-//    public ControlPacket sendControl(Device device, ControlPacket packet) {
+
+    //    public ControlPacket sendControl(Device device, ControlPacket packet) {
 //        synchronized (packet) {
 //            packetPool.offer(device, packet);
 //            try {
@@ -103,18 +103,10 @@ public class ControlService {
 //        return null;
 //    }
 //
-//    public ControlPacket recvControl(Device device, ControlPacket packet) {
-//        ControlPacket recvPacket = packetPool.poll(device);
-//        if (recvPacket == null)
-//            return null;
-//        synchronized (recvPacket) {
-//            recvPacket.setFellowPacketId(packet.getId());
-//            packet.setFellowPacketId(recvPacket.getId());
-//            packetRepository.save(packet);
-//            recvPacket.notify();
-//        }
-//        return recvPacket;
-//    }
+    public ControlPacket recvBlockingControl(Device device, ControlPacket packet) throws InterruptedException {
+        packetRepository.save(packet);
+        return packetPool.blockingPoll(device);
+    }
 
 
     public ControlPacket recordControl(ControlPacket controlPacket) {
