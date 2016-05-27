@@ -91,12 +91,14 @@ public class UserController implements Sessionable {
     @RequestMapping(value = "/modify.do", method = RequestMethod.POST)
     public String modify(@ModelAttribute(Sessionable.User) User user, @ModelAttribute(Sessionable.Status) WatcherStatus status,
                          @RequestParam("org") String orgP, @RequestParam("new") String newP) {
-        if (passMatcher.validate(orgP)) {
+        if (!passMatcher.validate(orgP)) {
             status.status = WatcherStatus.invalid_char;
+            this.logger.info(orgP+ " invalid");
             return "redirect:/profile.html";
         }
-        if (passMatcher.validate(orgP)) {
+        if (!passMatcher.validate(newP)) {
             status.status = WatcherStatus.invalid_char;
+            this.logger.info(newP+ " invalid");
             return "redirect:/profile.html";
         }
         if (user.getPassword().equals(orgP)) {
