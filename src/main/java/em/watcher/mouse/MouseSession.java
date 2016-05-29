@@ -133,6 +133,18 @@ public class MouseSession extends Thread {
         return String.valueOf(key);
     }
 
+    private void writePacket(int data) throws IOException {
+        out.print(data);
+    }
+
+    private void writePacket(float data) throws IOException {
+        out.print(data);
+    }
+
+    private void writePacket(String data) throws IOException {
+        out.write(data);
+    }
+
     private void ack() throws IOException {
         out.print((char) MessageType.ACK.ordinal());
         out.flush();
@@ -266,6 +278,10 @@ public class MouseSession extends Thread {
                                 int length = controlDef.getLength(s);
                                 packet.putField(s, readString(length));
                                 break;
+                            // TODO: ->Double
+                            case ControlDef.TYPE_CHAR:
+                                packet.putField(s, readString(1));
+                                break;
                             default:
                         }
                     }
@@ -280,6 +296,22 @@ public class MouseSession extends Thread {
                     packet.setDefId(controlDef.getId());
                     packet = controlService.recordControl(packet);
                     controlService.recvControl(device, packet);
+                    // TODO: send packet data
+                    for (String s : controlDef.getField()) {
+                        switch (controlDef.getType(s)) {
+                            case ControlDef.TYPE_INT:
+                                writePacket(Integer.parseInt(packet.getField(s)));
+                                break;
+                            case ControlDef.TYPE_FLOAT:
+                                writePacket(Float.parseFloat(packet.getField(s)));
+                                break;
+                            case ControlDef.TYPE_STRING:
+                                writePacket(packet.getField(s));
+                                break;
+                            default:
+                        }
+                    }
+                    out.flush();
                     break;
             }
         } catch (ReadFieldException e) {
