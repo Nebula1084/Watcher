@@ -73,7 +73,7 @@ public abstract class PacketTest {
         System.out.println();
         assertThat(this.deviceService.isExist(this.device.getId()), is(true));
         this.reportDef = new ReportDef("report1");
-        this.reportDef.addField("f1", WatcherPacketDef.TYPE_INT, 4);
+        this.reportDef.addField("f1", WatcherPacketDef.TYPE_FLOAT, 4);
         this.reportDef.addField("f2", WatcherPacketDef.TYPE_STRING, 10);
         this.user = this.userService.registerReport(this.user, this.reportDef);
         this.reportDef = this.user.getReportDefs().get(0);

@@ -25,13 +25,13 @@ public class ReportTest extends PacketTest {
     @Transactional
     public void testReport() throws Exception {
         MultiValueMap<String, String> mvm = this.getMvm(device, device, reportDef);
-        mvm.add("f1", "12");
-        mvm.add("f2", "sdfasdf");
+        mvm.add("f1", "12.2");
+        mvm.add("f2", "1234567abc");
         for (int i = 0; i < 20; i++)
             this.mockMvc.perform(post("/api/report").params(mvm)).andDo(print()).andExpect(status().isOk());
         assertThat(reportService.getLatest(reportDef) != null, is(true));
 
-        mvm.add("f3", "sdfasdf");
+        mvm.add("f3", "sdf.asdf");
         this.mockMvc.perform(post("/api/report").params(mvm)).andDo(print()).andExpect(status().isBadRequest());
         mvm = this.getMvm(device, device, reportDef);
         mvm.add("f3", "12");

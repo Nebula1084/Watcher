@@ -9,7 +9,7 @@ public class ContentMatcher {
     private Pattern pattern;
 
     public ContentMatcher() {
-        pattern = Pattern.compile("[a-zA-Z0-9_]+");
+        pattern = Pattern.compile("[a-zA-Z0-9_.]+");
     }
 
     public boolean validate(String str) {
