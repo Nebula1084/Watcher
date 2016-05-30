@@ -60,9 +60,9 @@ public class ControlService {
                 packet.putField(field, params.get(field));
             }
         packet.setDefId(controlDef.getId());
-        packet = this.recordControl(packet);
         switch (packet.getSR()) {
             case ControlPacket.Send:
+                packet = this.recordControl(packet);
                 Long targetId = Long.valueOf(params.get(TARGET_ID));
                 Device target = deviceService.findDevice(targetId);
                 packet.setTargetId(targetId);
@@ -81,7 +81,7 @@ public class ControlService {
     }
 
     public ControlPacket recvControl(Device device, ControlPacket packet) {
-        packetRepository.save(packet);
+//        packetRepository.save(packet);
         return packetPool.poll(device);
     }
 
