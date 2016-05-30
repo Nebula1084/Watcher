@@ -294,7 +294,7 @@ public class MouseSession extends Thread {
                 case ControlPacket.Recv:
                     Device device = deviceService.findDevice((long) device_id);
                     packet.setDefId(controlDef.getId());
-                    packet = controlService.recordControl(packet);
+//                    packet = controlService.recordControl(packet);
                     controlService.recvControl(device, packet);
                     // TODO: send packet data
                     for (String s : controlDef.getField()) {
