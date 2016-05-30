@@ -24,8 +24,8 @@
         <table class="table table-bordered" th:with="packet=${latestReport.get(def)}">
             <thead>
             <tr>
-                <th>Control Name</th>
-                <th>Control Id</th>
+                <th>Report Name</th>
+                <th>Report Id</th>
                 <th>Time</th>
                 <th th:each="field : ${def.getField()}" th:text="${field}"></th>
             </tr>

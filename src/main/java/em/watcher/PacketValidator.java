@@ -19,6 +19,7 @@ public class PacketValidator {
     @Autowired
     ContentMatcher contentMatcher;
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public boolean validatePacket(Map<String, String> params, WatcherPacketDef packetDef) throws IllegalArgumentException {
         Set<String> fieldSet = new HashSet<>(packetDef.getField());
         Set<String> testSet = new HashSet<>();
@@ -48,6 +49,22 @@ public class PacketValidator {
             String value = params.get(field);
             if (!contentMatcher.validate(value))
                 throw new IllegalArgumentException("Parameter contains invalid character.");
+            switch (packetDef.getType(field)) {
+                case WatcherPacketDef.TYPE_CHAR:
+                    if (value.length() != 1)
+                        throw new IllegalArgumentException("String length is not same with definition.");
+                    break;
+                case WatcherPacketDef.TYPE_FLOAT:
+                    Float.valueOf(value);
+                    break;
+                case WatcherPacketDef.TYPE_INT:
+                    Integer.valueOf(value);
+                    break;
+                case WatcherPacketDef.TYPE_STRING:
+                    if (packetDef.getLength(field) < value.length())
+                        throw new IllegalArgumentException("String length is not same with definition.");
+                    break;
+            }
         }
         return true;
     }
