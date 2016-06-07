@@ -59,9 +59,7 @@ public class ControlTest4 extends PacketTest {
         logger.info(def);
         MultiValueMap<String, String> sendForm = this.getMvm(device, device, controlDef);
         sendForm.add(TARGET_ID, String.valueOf(target.getId()));
-        sendForm.add("f1", "12");
-        sendForm.add("f2", "abfc");
-        sendForm.add("f3", "1");
+        sendForm.add("payload", "{\"f1\": \"12\",\"f2\": \"abfc\", \"f3\": \"1\"}");
         sendForm.add(SR, ControlPacket.Send);
 
         MultiValueMap<String, String> recvForm = this.getMvm(target, target, controlDef);
