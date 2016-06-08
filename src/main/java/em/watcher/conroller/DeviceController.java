@@ -202,7 +202,7 @@ public class DeviceController {
 
     @ModelAttribute("debug")
     public Boolean debug() {
-        Boolean debug=true;
+        Boolean debug = false;
         if (false) {
             WebContext context = new org.thymeleaf.context.WebContext(null, null, null);
             context.setVariable("debug", debug);
