@@ -23,11 +23,9 @@ public class ControlTest extends PacketTest {
     public void testSend() throws Exception {
         MultiValueMap<String, String> mvm = this.getMvm(device, device, controlDef);
         mvm.add(TARGET_ID, String.valueOf(target.getId()));
-        mvm.add("f1", "12");
-        mvm.add("f2", "sdfasdf");
-        mvm.add("f3", "1");
+        mvm.add("payload", "{\"f1\": \"12\",\"f2\": \"sdfasdf\", \"f3\": \"1\"}");
         this.mockMvc.perform(post("/api/control").params(mvm)).andDo(print()).andExpect(status().isBadRequest());
-        mvm.add("sr", "S");
+        mvm.add(SR, "S");
         this.mockMvc.perform(post("/api/control").params(mvm)).andDo(print()).andExpect(status().isOk());
     }
 
@@ -35,13 +33,11 @@ public class ControlTest extends PacketTest {
     @Transactional
     public void testRecv() throws Exception {
         MultiValueMap<String, String> mvm = this.getMvm(target,target, controlDef);
-        mvm.add("f1", "12");
-        mvm.add("f2", "sdfasdf");
-        mvm.add("f3", "1");
-        mvm.add("sr", "R");
+        mvm.add("payload", "{\"f1\": \"12\",\"f2\": \"sdfasdf\", \"f3\": \"1\"}");
+        mvm.add(SR, "R");
         this.mockMvc.perform(post("/api/control").params(mvm)).andDo(print()).andExpect(status().isBadRequest());
         mvm = this.getMvm(device, device, controlDef);
-        mvm.add("sr", "R");
+        mvm.add(SR, "R");
         this.mockMvc.perform(post("/api/control").params(mvm)).andDo(print()).andExpect(status().isNotFound());
     }
 
@@ -53,9 +49,7 @@ public class ControlTest extends PacketTest {
         logger.info(def);
         MultiValueMap<String, String> sendForm = this.getMvm(device, device, controlDef);
         sendForm.add(TARGET_ID, String.valueOf(target.getId()));
-        sendForm.add("f1", "12");
-        sendForm.add("f2", "abc");
-        sendForm.add("f3", "1");
+        sendForm.add("payload", "{\"f1\": \"12\",\"f2\": \"abc\", \"f3\": \"1\"}");
         sendForm.add(SR, ControlPacket.Send);
 
         MultiValueMap<String, String> recvForm = this.getMvm(target, target, controlDef);

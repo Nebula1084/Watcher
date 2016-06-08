@@ -3,22 +3,26 @@ package em.watcher.conroller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import em.watcher.control.ControlPacket;
 import em.watcher.control.ControlService;
+import em.watcher.device.Device;
 import em.watcher.device.DeviceService;
+import em.watcher.report.ReportDef;
+import em.watcher.report.ReportPacket;
 import em.watcher.report.ReportService;
 import em.watcher.user.ContentMatcher;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.thymeleaf.context.WebContext;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 public class PacketController {
@@ -76,6 +80,19 @@ public class PacketController {
         }
     }
 
+    @RequestMapping(value = "api/data", method = RequestMethod.GET)
+    public List<ReportPacket> data(@RequestParam("report_id") Long defId, @RequestParam("device_id") Long device_Id,
+                                   @PageableDefault(value = 200, sort = {"time"}, direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<ReportPacket> packets = null;
+        try {
+            ReportDef reportDef = reportService.getReportDef(defId);
+            packets = reportService.getReportPackets(reportDef.getId(), device_Id, pageable);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return packets.getContent();
+    }
+
     private void sendError(HttpServletResponse response, int code, String m) {
         try {
             response.sendError(code, m);
@@ -86,13 +103,19 @@ public class PacketController {
         }
     }
 
-    private Map<String, String> getParams(HttpServletRequest request) {
+    private Map<String, String> getParams(HttpServletRequest request) throws IOException {
         Map<String, String> params = new HashMap<>();
         Set<String> keys = request.getParameterMap().keySet();
         for (String key : keys) {
             String[] values = request.getParameterValues(key);
             if (values.length != 1) throw new IllegalArgumentException("Parameter format is not correct.");
-            params.put(key, values[0]);
+            if (key.equals("payload")) {
+                Map<String, String> attr = objectMapper.readValue(values[0], Map.class);
+                for (String attrKey : attr.keySet())
+                    params.put(attrKey, attr.get(attrKey));
+            } else
+                params.put(key, values[0]);
+
         }
         return params;
     }

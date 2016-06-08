@@ -15,12 +15,12 @@ abstract public class WatcherPacket {
     private Long deviceId;
     private Date time;
     @ElementCollection(fetch = FetchType.EAGER)
-    private Map<String, String> fields;
+    private Map<String, String> payload;
 
 
     public WatcherPacket() {
         time = Calendar.getInstance().getTime();
-        fields = new HashMap<>();
+        payload = new HashMap<>();
     }
 
     public Long getId() {
@@ -52,15 +52,15 @@ abstract public class WatcherPacket {
     }
 
     public void putField(String key, Object value) {
-        fields.put(key, value.toString());
+        payload.put(key, value.toString());
     }
 
     public String getField(String key) {
-        return fields.get(key);
+        return payload.get(key);
     }
 
-    public Map<String, String> getFields() {
-        return fields;
+    public Map<String, String> getPayload() {
+        return payload;
     }
 
     public String getTime() {

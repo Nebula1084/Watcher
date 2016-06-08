@@ -74,6 +74,10 @@ public class ReportService {
         return packetRepository.findByDefIdAndDeviceId(reportDef.getId(), device.getId(), pageable);
     }
 
+    public Page<ReportPacket> getReportPackets(Long report_id, Long device_id, Pageable pageable) {
+        return packetRepository.findByDefIdAndDeviceId(report_id, device_id, pageable);
+    }
+
     public ReportPacket getLatest(ReportDef reportDef) {
         return packetRepository.getLatest(reportDef.getId());
     }
