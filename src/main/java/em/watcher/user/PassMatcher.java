@@ -21,6 +21,7 @@ public class PassMatcher {
         validateSet.add("device_id");
         validateSet.add("control_id");
         if (validateSet.contains(str)) return false;
-        return pattern.matcher(str).matches();
+//        return pattern.matcher(str).matches();
+        return true;
     }
 }
