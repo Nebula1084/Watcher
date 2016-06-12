@@ -64,7 +64,7 @@ public class PacketController {
         try {
             ControlPacket ret = controlService.control(getParams(request));
             if (ret == null)
-                sendError(response, 404, "Target is not available.");
+                response.getWriter().print("{code:-1}");
             else {
                 if (Objects.equals(ret.getSR(), ControlPacket.Send))
                     objectMapper.writeValue(response.getWriter(), ret);
@@ -81,16 +81,18 @@ public class PacketController {
     }
 
     @RequestMapping(value = "api/data", method = RequestMethod.GET)
-    public List<ReportPacket> data(@RequestParam("report_id") Long defId, @RequestParam("device_id") Long device_Id,
-                                   @PageableDefault(value = 200, sort = {"time"}, direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<ReportPacket> packets = null;
+    public DataOut data(@RequestParam("report_id") Long defId, @RequestParam("device_id") Long device_Id,
+                        @PageableDefault(value = 200, sort = {"time"}, direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<ReportPacket> packets;
+        DataOut dataOut = new DataOut();
         try {
             ReportDef reportDef = reportService.getReportDef(defId);
             packets = reportService.getReportPackets(reportDef.getId(), device_Id, pageable);
+            dataOut.data = packets;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return packets.getContent();
+        return dataOut;
     }
 
     private void sendError(HttpServletResponse response, int code, String m) {
@@ -110,9 +112,9 @@ public class PacketController {
             String[] values = request.getParameterValues(key);
             if (values.length != 1) throw new IllegalArgumentException("Parameter format is not correct.");
             if (key.equals("payload")) {
-                Map<String, String> attr = objectMapper.readValue(values[0], Map.class);
+                Map<String, Object> attr = objectMapper.readValue(values[0], Map.class);
                 for (String attrKey : attr.keySet())
-                    params.put(attrKey, attr.get(attrKey));
+                    params.put(attrKey, attr.get(attrKey).toString());
             } else
                 params.put(key, values[0]);
 

@@ -25,7 +25,7 @@ public class ReportTest extends PacketTest {
     @Transactional
     public void testReport() throws Exception {
         MultiValueMap<String, String> mvm = this.getMvm(device, device, reportDef);
-        mvm.add("payload", "{\"f1\": \"12.2\",\"f2\": \"1234567abc\"}");
+        mvm.add("payload", "{\"f1\": 12.2,\"f2\": \"1234567abc\"}");
         for (int i = 0; i < 20; i++)
             this.mockMvc.perform(post("/api/report").params(mvm)).andDo(print()).andExpect(status().isOk());
         assertThat(reportService.getLatest(reportDef) != null, is(true));
@@ -33,11 +33,11 @@ public class ReportTest extends PacketTest {
         mvm.add("f3", "sdf.asdf");
         this.mockMvc.perform(post("/api/report").params(mvm)).andDo(print()).andExpect(status().isBadRequest());
         mvm = this.getMvm(device, device, reportDef);
-        mvm.add("payload", "{\"f3\": \"12\",\"f2\": \"sdfasdf\"}");
+        mvm.add("payload", "{\"f3\": 12,\"f2\": \"sdfasdf\"}");
         this.mockMvc.perform(post("/api/report").params(mvm)).andDo(print()).andExpect(status().isBadRequest());
         device.setId(100L);
         mvm = this.getMvm(device, device, reportDef);
-        mvm.add("payload", "{\"f1\": \"12\",\"f2\": \"sdfasdf\"}");
+        mvm.add("payload", "{\"f1\": 12,\"f2\": \"sdfasdf\"}");
         this.mockMvc.perform(post("/api/report").params(mvm)).andDo(print()).andExpect(status().isForbidden());
 
     }
