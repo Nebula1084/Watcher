@@ -36,9 +36,6 @@ public class ControlTest extends PacketTest {
         mvm.add("payload", "{\"f1\": \"12\",\"f2\": \"sdfasdf\", \"f3\": \"1\"}");
         mvm.add(SR, "R");
         this.mockMvc.perform(post("/api/control").params(mvm)).andDo(print()).andExpect(status().isBadRequest());
-        mvm = this.getMvm(device, device, controlDef);
-        mvm.add(SR, "R");
-        this.mockMvc.perform(post("/api/control").params(mvm)).andDo(print()).andExpect(status().isOk());
     }
 
     @Test

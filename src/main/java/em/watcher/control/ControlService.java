@@ -81,7 +81,7 @@ public class ControlService {
     }
 
     public ControlPacket recvControl(Device device, ControlPacket packet) throws InterruptedException {
-        return packetPool.poll(device);
+        return packetPool.blockingPoll(device);
     }
 
     //    public ControlPacket sendControl(Device device, ControlPacket packet) {

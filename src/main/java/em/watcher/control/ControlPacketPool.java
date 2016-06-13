@@ -59,10 +59,10 @@ public class ControlPacketPool {
         Deque<ControlPacket> packetDeque = getDeque(device);
         ControlPacket controlPacket = null;
         synchronized (packetDeque) {
-            while (controlPacket == null) {
+            controlPacket = packetDeque.poll();
+            if (controlPacket == null) {
+                packetDeque.wait(1000 * 60 * 2);
                 controlPacket = packetDeque.poll();
-                if (controlPacket == null)
-                    packetDeque.wait(10);
             }
         }
         return controlPacket;
