@@ -8,8 +8,6 @@ import javax.persistence.*;
 
 @Entity
 public class ControlPacket extends WatcherPacket {
-    @Transient
-    private Integer code = 0;
     private String SR = "N";
     private Long targetId = NO_TARGET;
 
@@ -37,4 +35,7 @@ public class ControlPacket extends WatcherPacket {
         return targetId;
     }
 
+    public Integer getCode() {
+        return code;
+    }
 }
