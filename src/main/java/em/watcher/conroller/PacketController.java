@@ -110,9 +110,9 @@ public class PacketController {
             String[] values = request.getParameterValues(key);
             if (values.length != 1) throw new IllegalArgumentException("Parameter format is not correct.");
             if (key.equals("payload")) {
-                Map<String, String> attr = objectMapper.readValue(values[0], Map.class);
+                Map<String, Object> attr = objectMapper.readValue(values[0], Map.class);
                 for (String attrKey : attr.keySet())
-                    params.put(attrKey, attr.get(attrKey));
+                    params.put(attrKey, attr.get(attrKey).toString());
             } else
                 params.put(key, values[0]);
 

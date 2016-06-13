@@ -104,7 +104,7 @@ public class ControlService {
 //    }
 //
     public ControlPacket recvBlockingControl(Device device, ControlPacket packet) throws InterruptedException {
-        packetRepository.save(packet);
+//        packetRepository.save(packet);
         return packetPool.blockingPoll(device);
     }
 
