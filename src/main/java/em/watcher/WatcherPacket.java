@@ -7,6 +7,9 @@ import java.util.*;
 
 @MappedSuperclass
 abstract public class WatcherPacket {
+    @Transient
+    public Integer code = 0;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

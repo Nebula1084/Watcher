@@ -49,6 +49,9 @@ public class PacketController {
     @RequestMapping(value = "/api/report", method = RequestMethod.POST)
     public void report(HttpServletRequest request, HttpServletResponse response) {
         try {
+
+            logger.info(request.getParameterMap());
+
             reportService.report(getParams(request));
         } catch (IllegalArgumentException e) {
             logger.error(e);
