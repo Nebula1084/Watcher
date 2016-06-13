@@ -38,7 +38,7 @@ public class ControlTest extends PacketTest {
         this.mockMvc.perform(post("/api/control").params(mvm)).andDo(print()).andExpect(status().isBadRequest());
         mvm = this.getMvm(device, device, controlDef);
         mvm.add(SR, "R");
-        this.mockMvc.perform(post("/api/control").params(mvm)).andDo(print()).andExpect(status().isNotFound());
+        this.mockMvc.perform(post("/api/control").params(mvm)).andDo(print()).andExpect(status().isOk());
     }
 
     @Test

@@ -64,7 +64,7 @@ public class PacketController {
         try {
             ControlPacket ret = controlService.control(getParams(request));
             if (ret == null)
-                sendError(response, 404, "Target is not available.");
+                response.getWriter().print("{code:-1}");
             else {
                 if (Objects.equals(ret.getSR(), ControlPacket.Send))
                     objectMapper.writeValue(response.getWriter(), ret);

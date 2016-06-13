@@ -62,7 +62,7 @@ public class ControlPacketPool {
             while (controlPacket == null) {
                 controlPacket = packetDeque.poll();
                 if (controlPacket == null)
-                    packetDeque.wait(1000 * 60 * 2);
+                    packetDeque.wait(10);
             }
         }
         return controlPacket;
