@@ -10,11 +10,9 @@ import javax.persistence.*;
 public class ControlPacket extends WatcherPacket {
     private String SR = "N";
     private Long targetId = NO_TARGET;
-    private Long fellowPacketId = NO_FELLOW;
 
     public static final String Send = "S";
     public static final String Recv = "R";
-    public static final Long NO_FELLOW = -1L;
     public static final Long NO_TARGET = -1L;
 
     public ControlPacket() {
@@ -37,11 +35,4 @@ public class ControlPacket extends WatcherPacket {
         return targetId;
     }
 
-    public void setFellowPacketId(Long fellowPacketId) {
-        this.fellowPacketId = fellowPacketId;
-    }
-
-    public Long getFellowPacketId() {
-        return fellowPacketId;
-    }
 }

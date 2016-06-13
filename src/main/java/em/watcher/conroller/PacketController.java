@@ -81,16 +81,18 @@ public class PacketController {
     }
 
     @RequestMapping(value = "api/data", method = RequestMethod.GET)
-    public List<ReportPacket> data(@RequestParam("report_id") Long defId, @RequestParam("device_id") Long device_Id,
-                                   @PageableDefault(value = 200, sort = {"time"}, direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<ReportPacket> packets = null;
+    public DataOut data(@RequestParam("report_id") Long defId, @RequestParam("device_id") Long device_Id,
+                        @PageableDefault(value = 200, sort = {"time"}, direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<ReportPacket> packets;
+        DataOut dataOut = new DataOut();
         try {
             ReportDef reportDef = reportService.getReportDef(defId);
             packets = reportService.getReportPackets(reportDef.getId(), device_Id, pageable);
+            dataOut.data = packets;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return packets.getContent();
+        return dataOut;
     }
 
     private void sendError(HttpServletResponse response, int code, String m) {
