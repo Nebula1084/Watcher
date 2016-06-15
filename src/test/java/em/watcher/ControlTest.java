@@ -54,7 +54,7 @@ public class ControlTest extends PacketTest {
         Thread sender = new Thread() {
             public void run() {
                 try {
-                    ControlTest.this.mockMvc.perform(post("/api/control").params(sendForm)).andDo(print()).andExpect(status().isOk());
+                    ControlTest.this.mockMvc.perform(post("/api/control").params(recvForm)).andDo(print()).andExpect(status().isOk());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -62,7 +62,7 @@ public class ControlTest extends PacketTest {
         };
         sender.start();
         Thread.sleep(1000);
-        ControlTest.this.mockMvc.perform(post("/api/control").params(recvForm)).andDo(print()).andExpect(status().isOk());
+        ControlTest.this.mockMvc.perform(post("/api/control").params(sendForm)).andDo(print()).andExpect(status().isOk());
         sender.join();
     }
 

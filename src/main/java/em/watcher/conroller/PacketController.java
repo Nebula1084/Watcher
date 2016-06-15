@@ -1,6 +1,7 @@
 package em.watcher.conroller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import em.watcher.control.ControlDef;
 import em.watcher.control.ControlPacket;
 import em.watcher.control.ControlService;
 import em.watcher.device.Device;
@@ -23,6 +24,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
+
+import static em.watcher.control.ControlPacket.Recv;
+import static em.watcher.control.ControlPacket.Send;
 
 @RestController
 public class PacketController {
@@ -49,10 +53,16 @@ public class PacketController {
     @RequestMapping(value = "/api/report", method = RequestMethod.POST)
     public void report(HttpServletRequest request, HttpServletResponse response) {
         try {
-
-            logger.info(request.getParameterMap());
-
-            reportService.report(getParams(request));
+            Scanner scanner = new Scanner(request.getInputStream());
+            String jsonStr = "";
+            while (scanner.hasNext()) {
+                jsonStr += scanner.next();
+            }
+            if (Objects.equals(jsonStr, ""))
+                reportService.report(getParams(request));
+            else
+                reportService.report(getParams(jsonStr));
+            response.getWriter().println("{\"code\":0}");
         } catch (IllegalArgumentException e) {
             logger.error(e);
             sendError(response, 400, e.getMessage());
@@ -67,9 +77,9 @@ public class PacketController {
         try {
             ControlPacket ret = controlService.control(getParams(request));
             if (ret == null)
-                response.getWriter().print("{code:-1}");
+                response.getWriter().print("{\"code\":-1}");
             else {
-                if (Objects.equals(ret.getSR(), ControlPacket.Send))
+                if (Objects.equals(ret.getSR(), Send))
                     objectMapper.writeValue(response.getWriter(), ret);
             }
         } catch (IllegalArgumentException e) {
@@ -98,6 +108,89 @@ public class PacketController {
         return dataOut;
     }
 
+    @RequestMapping(value = "api/push", method = RequestMethod.POST)
+    public void push(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            Scanner scanner = new Scanner(request.getInputStream());
+            String jsonStr = "";
+            while (scanner.hasNext()) {
+                jsonStr += scanner.next();
+            }
+            Map<String, Object> attr = objectMapper.readValue(jsonStr, Map.class);
+            Map<String, String> params = new HashMap<>();
+            params.put(CONTROL_ID, attr.get(CONTROL_ID).toString());
+            params.put(TARGET_ID, request.getParameter(DEVICE_ID).toString());
+            params.put(AUTH_KEY, "-1");
+            params.put(AUTH_ID, "-1");
+            params.put(DEVICE_ID, "-1");
+            params.put(SR, Send);
+            List<Map<String, Object>> fields = (List<Map<String, Object>>) attr.get("payload");
+            for (Map<String, Object> field : fields) {
+                params.put(field.get("name").toString(), field.get("value").toString());
+            }
+            ControlPacket ret = controlService.control(params, false);
+            if (ret == null)
+                response.getWriter().print("{\"code\":-1}");
+            else {
+                response.getWriter().print("{\"code\":0}");
+            }
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            logger.error(e);
+            sendError(response, 400, e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e);
+            sendError(response, 403, e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "api/poll", method = RequestMethod.POST)
+    public void poll(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            Scanner scanner = new Scanner(request.getInputStream());
+            String jsonStr = "";
+            while (scanner.hasNext()) {
+                jsonStr += scanner.next();
+            }
+            Map<String, String> params = getParams(jsonStr);
+            params.put(SR, Recv);
+
+            ControlPacket ret = controlService.control(params);
+            if (ret == null)
+                response.getWriter().print("{\"code\":-1}");
+            else {
+                ret.getPayload();
+                Map<String, Object> res= new HashMap<>();
+
+                ControlDef controlDef = controlService.getControlDef(ret.getDefId());
+                for (String key : controlDef.getField()){
+                    switch (controlDef.getType(key)){
+                        case ControlDef.TYPE_FLOAT:
+                            res.put(key, Float.valueOf(ret.getPayload().get(key)));
+                            break;
+                        case ControlDef.TYPE_INT:
+                            res.put(key, Integer.valueOf(ret.getPayload().get(key)));
+                            break;
+                        default:
+                            res.put(key, ret.getPayload().get(key));
+                    }
+                }
+                res.put("code", 0);
+                objectMapper.writeValue(response.getWriter(), res);
+            }
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            logger.error(e);
+            sendError(response, 400, e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e);
+            sendError(response, 403, e.getMessage());
+        }
+    }
+
+
     private void sendError(HttpServletResponse response, int code, String m) {
         try {
             response.sendError(code, m);
@@ -120,6 +213,23 @@ public class PacketController {
                     params.put(attrKey, attr.get(attrKey).toString());
             } else
                 params.put(key, values[0]);
+
+        }
+        return params;
+    }
+
+    private Map<String, String> getParams(String request) throws IOException {
+        Map<String, String> params = new HashMap<>();
+        Map<String, Object> param = objectMapper.readValue(request, Map.class);
+        Set<String> keys = param.keySet();
+        for (String key : keys) {
+            Object values = param.get(key);
+            if (key.equals("payload")) {
+                Map<String, Object> attr = (Map<String, Object>) values;
+                for (String attrKey : attr.keySet())
+                    params.put(attrKey, attr.get(attrKey).toString());
+            } else
+                params.put(key, values.toString());
 
         }
         return params;
