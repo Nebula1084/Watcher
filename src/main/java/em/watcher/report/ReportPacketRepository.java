@@ -20,4 +20,9 @@ public interface ReportPacketRepository extends CrudRepository<ReportPacket, Lon
     @Query("select p from ReportPacket p where p.id = (select max(q.id) from ReportPacket q where q.defId = ?1 and q.deviceId = ?2)")
     ReportPacket getLatest(Long defId, Long devId);
 
+    @Query("select p from ReportPacket p where p.id = (select max(q.id) from ReportPacket q where q.deviceId = ?1)")
+    ReportPacket getLatestByDev(Long devId);
+    @Query("select p from ReportPacket p where p.id = (select max(q.id) from ReportPacket q where q.authId = ?1)")
+    ReportPacket getLatestByAuth(Long authId);
+
 }

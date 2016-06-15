@@ -20,4 +20,10 @@ public interface ControlPacketRepository extends CrudRepository<ControlPacket, L
 
     @Query("select p from ControlPacket p where p.id = (select max(q.id) from ControlPacket q where q.defId = ?1 and q.deviceId = ?2)")
     ControlPacket getLatest(Long defId, Long devId);
+
+    @Query("select p from ControlPacket p where p.id = (select max(q.id) from ControlPacket q where q.deviceId = ?1)")
+    ControlPacket getLatestByDev(Long devId);
+
+    @Query("select p from ControlPacket p where p.id = (select max(q.id) from ControlPacket q where q.authId = ?1)")
+    ControlPacket getLatestByAuth(Long authId);
 }

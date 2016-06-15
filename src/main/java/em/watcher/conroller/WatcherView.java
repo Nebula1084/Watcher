@@ -2,7 +2,9 @@ package em.watcher.conroller;
 
 import em.watcher.Sessionable;
 import em.watcher.WatcherStatus;
+import em.watcher.device.DeviceService;
 import em.watcher.user.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,6 +23,10 @@ public class WatcherView implements Sessionable {
     public static final String deviceRgstPage = "register_device.html";
     public static final String helpPage = "help.html";
     public static final String devicePage = "device.html";
+    public static final String activePage = "active.html";
+
+    @Autowired
+    DeviceService deviceService;
 
     @RequestMapping(value = {"/error"}, method = {RequestMethod.GET})
     public String error() {
@@ -73,5 +79,11 @@ public class WatcherView implements Sessionable {
     @RequestMapping(value = "/" + WatcherView.helpPage)
     public String helpPage(@ModelAttribute(Sessionable.User) User user, Model model) {
         return WatcherView.helpPage;
+    }
+
+    @RequestMapping(value = "/" + WatcherView.activePage)
+    public String activePage(@ModelAttribute(Sessionable.User) User user, Model model) {
+        model.addAttribute("devices", deviceService.findAllActiveDevices());
+        return WatcherView.activePage;
     }
 }
