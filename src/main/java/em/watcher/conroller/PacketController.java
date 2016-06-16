@@ -101,7 +101,7 @@ public class PacketController {
         try {
             ReportDef reportDef = reportService.getReportDef(defId);
             packets = reportService.getReportPackets(reportDef.getId(), device_Id, pageable);
-            dataOut.data = packets;
+            dataOut.data = packets.getContent();
         } catch (Exception e) {
             e.printStackTrace();
         }
