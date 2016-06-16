@@ -46,8 +46,10 @@ public class ControlService {
         Long deviceId = Long.valueOf(params.get(DEVICE_ID));
 
         Device device = null;
-        if (fromDevice)
+        if (fromDevice) {
             device = deviceService.findDevice(deviceId);
+            deviceService.activate(device);
+        }
 
         ControlPacket packet = new ControlPacket();
         packet.setAuthId(authId);

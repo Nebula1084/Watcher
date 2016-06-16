@@ -44,6 +44,7 @@ public class ReportService {
             throw new Exception("Device " + deviceId + " doesn't exist.");
         reportDef = this.getReportDef(reportId);
         packetValidator.validatePacket(params, reportDef);
+        deviceService.activate(deviceService.findDevice(deviceId));
         ReportPacket packet = new ReportPacket();
         packet.setAuthId(authId);
         packet.setDeviceId(deviceId);

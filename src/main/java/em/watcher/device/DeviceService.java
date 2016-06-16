@@ -21,10 +21,11 @@ public class DeviceService {
     ReportPacketRepository reportPacketRepository;
     @Autowired
     ControlPacketRepository controlPacketRepository;
-    private Map<Long, Device> deviceMap=new HashMap<>();
+    private Map<Long, Device> deviceMap = new HashMap<>();
 
     public boolean authenticate(Long id, String key) throws Exception {
         Device device = findDevice(id);
+        activate(device);
         return device.authenticate(key);
     }
 
@@ -38,10 +39,13 @@ public class DeviceService {
         List<Device> devices = deviceRepository.findById(id);
         if (devices.isEmpty())
             throw new Exception("Device " + id + " doesn't exist.");
-        Device device = devices.get(0);
-        device.setTimestamp(Calendar.getInstance().getTime());
+
+        return devices.get(0);
+    }
+
+    public void activate(Device device) {
         deviceMap.put(device.getId(), device);
-        return device;
+        deviceMap.get(device.getId()).setTimestamp(Calendar.getInstance().getTime());
     }
 
     public List<Device> findAllActiveDevices() {
