@@ -1,11 +1,9 @@
 package em.watcher.device;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
@@ -19,6 +17,8 @@ public class Device {
     private String userAccount;
     private String name;
     private String secret;
+    @Transient
+    private Date Timestamp;
 
     public Device() {
 
@@ -39,6 +39,14 @@ public class Device {
 
     public String getName() {
         return name;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        Timestamp = timestamp;
+    }
+
+    public Date getTimestamp() {
+        return Timestamp;
     }
 
     public void setUserAccount(String userAccount) {

@@ -9,9 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -23,6 +21,7 @@ public class DeviceService {
     ReportPacketRepository reportPacketRepository;
     @Autowired
     ControlPacketRepository controlPacketRepository;
+    private Map<Long, Device> deviceMap=new HashMap<>();
 
     public boolean authenticate(Long id, String key) throws Exception {
         Device device = findDevice(id);
@@ -39,33 +38,26 @@ public class DeviceService {
         List<Device> devices = deviceRepository.findById(id);
         if (devices.isEmpty())
             throw new Exception("Device " + id + " doesn't exist.");
-        return devices.get(0);
+        Device device = devices.get(0);
+        device.setTimestamp(Calendar.getInstance().getTime());
+        deviceMap.put(device.getId(), device);
+        return device;
     }
 
     public List<Device> findAllActiveDevices() {
         List<Device> devices = deviceRepository.findAll();
         Date current = Calendar.getInstance().getTime();
-        return devices.stream().filter(device -> {
-            if (getInterval(current, reportPacketRepository.getLatestByDev(device.getId())))
-                return true;
-            if (getInterval(current, reportPacketRepository.getLatestByAuth(device.getId())))
-                return true;
-            if (getInterval(current, controlPacketRepository.getLatestByDev(device.getId())))
-                return true;
-            if (getInterval(current, controlPacketRepository.getLatestByAuth(device.getId())))
-                return true;
-            return false;
-        }).collect(Collectors.toList());
+        return devices.stream().filter(device -> getInterval(current, deviceMap.get(device.getId()))).collect(Collectors.toList());
     }
 
-    private Boolean getInterval(Date now, WatcherPacket past) {
+    private Boolean getInterval(Date now, Device device) {
         if (now == null)
             return false;
-        if (past == null)
+        if (device == null)
             return false;
-        System.out.println(now);
-        System.out.println(past.getDate());
-        return now.getTime() - past.getDate().getTime() < 60 * 60 * 1000;
+        if (device.getTimestamp() == null)
+            return false;
+        return now.getTime() - device.getTimestamp().getTime() < 60 * 60 * 1000;
     }
 
 }

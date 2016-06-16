@@ -64,10 +64,10 @@ public class PacketController {
                 reportService.report(getParams(jsonStr));
             response.getWriter().println("{\"code\":0}");
         } catch (IllegalArgumentException e) {
-            logger.error(e);
+            e.printStackTrace();
             sendError(response, 400, e.getMessage());
         } catch (Exception e) {
-            logger.error(e);
+            e.printStackTrace();
             sendError(response, 403, e.getMessage());
         }
     }

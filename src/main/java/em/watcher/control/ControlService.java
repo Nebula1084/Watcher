@@ -3,8 +3,6 @@ package em.watcher.control;
 import em.watcher.PacketValidator;
 import em.watcher.device.Device;
 import em.watcher.device.DeviceService;
-import em.watcher.report.ReportDef;
-import em.watcher.report.ReportPacket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -81,7 +79,7 @@ public class ControlService {
     }
 
     public ControlPacket recvControl(Device device, ControlPacket packet) throws InterruptedException {
-        packetRepository.save(packet);
+//        packetRepository.save(packet);
         return packetPool.blockingPoll(device);
     }
 
