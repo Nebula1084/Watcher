@@ -9,10 +9,8 @@ import em.watcher.report.ReportDef;
 import em.watcher.report.ReportService;
 import em.watcher.report.ReportPacket;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import javax.validation.constraints.Null;
+import java.io.*;
 import java.net.Socket;
 
 class ReadFieldException extends Exception {
@@ -24,7 +22,7 @@ class ReadFieldException extends Exception {
 public class MouseSession extends Thread {
     private Socket socket;
     private BufferedReader in;
-    private PrintWriter out;
+    private PrintStream out;
 
     private DeviceService deviceService;
     private ReportService reportService;
@@ -49,7 +47,7 @@ public class MouseSession extends Thread {
         System.out.println("connection");
         try {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "ISO-8859-1"));
-            out = new PrintWriter(socket.getOutputStream(), true);
+            out = new PrintStream(socket.getOutputStream(), true);
 
             if (login()) {
                 System.out.println("Login successfully.");
@@ -134,24 +132,27 @@ public class MouseSession extends Thread {
     }
 
     private void writePacket(int data) throws IOException {
-        out.print(data);
+        for (int i = 0; i < 4; i++) {
+            out.write( ((data)>>(8 * i)) & 0xFF );
+        }
     }
 
     private void writePacket(float data) throws IOException {
+        int rawData = Float.floatToRawIntBits(data);
         out.print(data);
     }
 
     private void writePacket(String data) throws IOException {
-        out.write(data);
+        //out.write();
     }
 
     private void ack() throws IOException {
-        out.print((char) MessageType.ACK.ordinal());
+        out.write((char) MessageType.ACK.ordinal());
         out.flush();
     }
 
     private void nack() throws IOException {
-        out.print((char) MessageType.NACK.ordinal());
+        out.write((char) MessageType.NACK.ordinal());
         out.flush();
     }
 
@@ -252,9 +253,13 @@ public class MouseSession extends Thread {
         boolean ret = true;
 
         try {
-            String tag = readString(1);
-            int device_id = readInt();
-            int control_id = readInt();
+            String tag = readString(1);//1
+            int device_id = readInt();//2
+            int control_id = readInt();//3
+
+            System.out.println("Tag:" + tag);
+            System.out.println("source devide id:" + device_id);
+            System.out.println("Control id:" + control_id);
 
             ControlDef controlDef = controlService.getControlDef((long) control_id);
             ControlPacket packet = new ControlPacket();
@@ -264,7 +269,7 @@ public class MouseSession extends Thread {
 
             switch (tag) {
                 case ControlPacket.Send:
-                    int target_id = readInt();
+                    int target_id = readInt();//4
                     Device target = deviceService.findDevice((long) target_id);
                     for (String s : controlDef.getField()) {
                         switch (controlDef.getType(s)) {
@@ -294,24 +299,42 @@ public class MouseSession extends Thread {
                 case ControlPacket.Recv:
                     Device device = deviceService.findDevice((long) device_id);
                     packet.setDefId(controlDef.getId());
-//                    packet = controlService.recordControl(packet);
-                    controlService.recvControl(device, packet);
+                    packet = controlService.recvControl(device, packet);
                     // TODO: send packet data
-                    for (String s : controlDef.getField()) {
-                        switch (controlDef.getType(s)) {
-                            case ControlDef.TYPE_INT:
-                                writePacket(Integer.parseInt(packet.getField(s)));
-                                break;
-                            case ControlDef.TYPE_FLOAT:
-                                writePacket(Float.parseFloat(packet.getField(s)));
-                                break;
-                            case ControlDef.TYPE_STRING:
-                                writePacket(packet.getField(s));
-                                break;
-                            default:
+                    if (packet != null) {
+
+                        int cnt = 0;
+                        byte[] retPacket = new byte[controlDef.getTotalLength() + 1];
+                        retPacket[cnt++] = (byte) MessageType.CONTROL.ordinal();
+
+                        for (String s : controlDef.getField()) {
+                            System.out.println("Sending " + packet.getField(s));
+                            switch (controlDef.getType(s)) {
+                                case ControlDef.TYPE_INT:
+                                    int data = Integer.parseInt(packet.getField(s));
+                                    for (int i = 0; i < 4; i++) {
+                                        retPacket[cnt++] = (byte)(((data)>>(8 * i)) & 0xFF);
+                                    }
+                                    break;
+                                case ControlDef.TYPE_FLOAT:
+                                    int rawdata = Float.floatToIntBits(Float.parseFloat(packet.getField(s)));
+                                    for (int i = 0; i < 4; i++) {
+                                        retPacket[cnt++] = (byte)(((rawdata)>>(8 * i)) & 0xFF);
+                                    }
+                                    break;
+                                case ControlDef.TYPE_STRING: case ControlDef.TYPE_CHAR:
+                                    String strData = packet.getField(s);
+                                    for (int i = 0; i < strData.length(); i++) {
+                                        retPacket[cnt++] = (byte)strData.charAt(i);
+                                    }
+                                    break;
+                                default:
+                            }
                         }
+                        out.write(retPacket);
+                    } else {
+                        respond(false);
                     }
-                    out.flush();
                     break;
             }
         } catch (ReadFieldException e) {

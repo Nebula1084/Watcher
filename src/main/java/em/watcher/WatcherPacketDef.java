@@ -68,6 +68,14 @@ public abstract class WatcherPacketDef {
     public int getLength(String name) {
         return lengths.get(name);
     }
+    
+    public int getTotalLength() {
+        int length = 0;
+        for (int eachLength: lengths.values()) {
+            length += eachLength;
+        }
+        return length;
+    }
 
     public void addField(String name, String type, Integer length) throws Exception {
         if (!isType(type, length)) throw new Exception("type is invalid.");
