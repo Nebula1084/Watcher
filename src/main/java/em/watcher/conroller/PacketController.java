@@ -102,6 +102,7 @@ public class PacketController {
             ReportDef reportDef = reportService.getReportDef(defId);
             packets = reportService.getReportPackets(reportDef.getId(), device_Id, pageable);
             dataOut.data = packets.getContent();
+            dataOut.code = 0;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -161,11 +162,11 @@ public class PacketController {
                 response.getWriter().print("{\"code\":-1}");
             else {
                 ret.getPayload();
-                Map<String, Object> res= new HashMap<>();
+                Map<String, Object> res = new HashMap<>();
 
                 ControlDef controlDef = controlService.getControlDef(ret.getDefId());
-                for (String key : controlDef.getField()){
-                    switch (controlDef.getType(key)){
+                for (String key : controlDef.getField()) {
+                    switch (controlDef.getType(key)) {
                         case ControlDef.TYPE_FLOAT:
                             res.put(key, Float.valueOf(ret.getPayload().get(key)));
                             break;
